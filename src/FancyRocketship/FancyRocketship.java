@@ -77,7 +77,7 @@ public class FancyRocketship extends JPanel implements ActionListener {
 
 	void purgeShips() {
 		for (int i = ships.size() - 1; i >= 0; i--) {
-			if (ships.get(i).y < 0 && ships.get(i).smoke.size() <= 20) {
+			if (ships.get(i).y < 0 && ships.get(i).smoke.size() <= 6) {
 				ships.remove(i);
 			}
 		}

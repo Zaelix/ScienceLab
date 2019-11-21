@@ -25,8 +25,8 @@ class Ship {
 	Ship(int x, int y) {
 		this.x = x;
 		this.y = y;
-		c = new Color(gen.nextInt(255),gen.nextInt(255),gen.nextInt(255));
-		size = gen.nextInt(50)+15;
+		c = new Color(gen.nextInt(255), gen.nextInt(255), gen.nextInt(255));
+		size = gen.nextInt(50) + 15;
 	}
 
 	void draw(Graphics g) {
@@ -34,27 +34,35 @@ class Ship {
 		drawSmoke(g);
 		// stroke(1);
 		int red = gen.nextInt(65) + 190;
+		Color color = new Color(gen.nextInt(255), gen.nextInt(255), gen.nextInt(255));
 		if (flashing % 3 == 0) {
-			g.setColor(new Color(red, 60, 60));
-			g.fillOval(x - (int)(size*1.02), y + (int)(size*1.2), (int)(size*2), (int)(size*2));
+			if (isRainbow) {
+				g.setColor(c);
+			} else {
+				g.setColor(new Color(red, 60, 60));
+			}
+			g.fillOval(x - (int) (size * 1.02), y + (int) (size * 1.15), (int) (size * 2), (int) (size * 2));
 		} else {
-			g.setColor(new Color(red, 30, 30));
-			g.fillOval(x - (int)(size*0.87), y + size, (int)(size*1.7), (int)(size*1.7));
+			if (isRainbow) {
+				g.setColor(c);
+			} else {
+				g.setColor(new Color(red, 30, 30));
+			}
+			g.fillOval(x - (int) (size * 0.87), y + size, (int) (size * 1.7), (int) (size * 1.7));
 		}
 		flashing++;
-		Color color = new Color(gen.nextInt(255),gen.nextInt(255),gen.nextInt(255));
-		if(isRainbow) {
-			c=color;
+		if (isRainbow) {
+			c = color;
 		}
 		g.setColor(c);
 		int[] xs = { x - size, x, x + size };
-		int[] ys = {(int)( y + size*1.5), y, (int)( y + size*1.5) };
+		int[] ys = { (int) (y + size * 1.5), y, (int) (y + size * 1.5) };
 		g.fillPolygon(xs, ys, 3);
 		for (int i = 0; i < 4; i++) {
-			Smoke s = new Smoke(x - 8, y - (speed) + 50, gen.nextDouble() * 2 - 1, gen.nextDouble() * 3 + 2, 15);
+			Smoke s = new Smoke(x - 8, y + (size), gen.nextDouble() * 2 - 1, gen.nextDouble() * 3 + 2, 15);
 			s.setOffset(smokeOffset++);
-			if(isRainbow) {
-				c=color;
+			if (isRainbow) {
+				c = color;
 			}
 			s.setColor(c);
 			if (smokeOffset == FancyRocketship.offsetMax) {
