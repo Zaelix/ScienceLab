@@ -7,9 +7,8 @@ import java.awt.Graphics2D;
 import java.util.ArrayList;
 import java.util.Random;
 
-import javax.swing.JOptionPane;
-
 class Ship {
+	public static boolean allowColoredSmoke = false;
 	int x;
 	int y;
 	int size = 20;
@@ -18,15 +17,23 @@ class Ship {
 	double speed = 1;
 	int smokeOffset = 0;
 	Random gen = new Random();
-	Color c;
 	boolean isRainbow = false;
 	ArrayList<Smoke> smoke = new ArrayList<Smoke>();
+	Color rocketColor;
+	Color smokeColor;
 
 	Ship(int x, int y) {
 		this.x = x;
 		this.y = y;
-		c = new Color(gen.nextInt(255), gen.nextInt(255), gen.nextInt(255));
-		size = gen.nextInt(50) + 15;
+		rocketColor = new Color(gen.nextInt(255), gen.nextInt(255), gen.nextInt(255));
+
+		size = gen.nextInt(50) + 10;
+		speed = 5 / ((size / 20) + 1);
+		if (allowColoredSmoke) {
+			smokeColor = rocketColor;
+		} else {
+			smokeColor = new Color(255-size*4, 255-size*4, 255-size*4);
+		}
 	}
 
 	void draw(Graphics g) {
@@ -35,36 +42,39 @@ class Ship {
 		// stroke(1);
 		int red = gen.nextInt(65) + 190;
 		Color color = new Color(gen.nextInt(255), gen.nextInt(255), gen.nextInt(255));
+		if (allowColoredSmoke) {
+			smokeColor = rocketColor;
+		} else {
+			smokeColor = new Color(255-size*4, 255-size*4, 255-size*4);
+		}
+		if (isRainbow) {
+			rocketColor = color;
+			smokeColor = color;
+		}
 		if (flashing % 3 == 0) {
 			if (isRainbow) {
-				g.setColor(c);
+				g.setColor(rocketColor);
 			} else {
 				g.setColor(new Color(red, 60, 60));
 			}
 			g.fillOval(x - (int) (size * 1.02), y + (int) (size * 1.15), (int) (size * 2), (int) (size * 2));
 		} else {
 			if (isRainbow) {
-				g.setColor(c);
+				g.setColor(rocketColor);
 			} else {
 				g.setColor(new Color(red, 30, 30));
 			}
 			g.fillOval(x - (int) (size * 0.87), y + size, (int) (size * 1.7), (int) (size * 1.7));
 		}
 		flashing++;
-		if (isRainbow) {
-			c = color;
-		}
-		g.setColor(c);
+		g.setColor(rocketColor);
 		int[] xs = { x - size, x, x + size };
 		int[] ys = { (int) (y + size * 1.5), y, (int) (y + size * 1.5) };
 		g.fillPolygon(xs, ys, 3);
 		for (int i = 0; i < 4; i++) {
 			Smoke s = new Smoke(x - 8, y + (size), gen.nextDouble() * 2 - 1, gen.nextDouble() * 3 + 2, 15);
 			s.setOffset(smokeOffset++);
-			if (isRainbow) {
-				c = color;
-			}
-			s.setColor(c);
+			s.setColor(smokeColor);
 			if (smokeOffset == FancyRocketship.offsetMax) {
 				smokeOffset = 0;
 			}

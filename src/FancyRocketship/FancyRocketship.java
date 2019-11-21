@@ -5,6 +5,8 @@ import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
 import java.util.ArrayList;
 import java.util.Queue;
 import java.util.Random;
@@ -14,7 +16,7 @@ import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.Timer;
 
-public class FancyRocketship extends JPanel implements ActionListener {
+public class FancyRocketship extends JPanel implements ActionListener, KeyListener {
 
 	public static void main(String[] args) {
 		// TODO Auto-generated method stub
@@ -70,9 +72,13 @@ public class FancyRocketship extends JPanel implements ActionListener {
 	}
 	void drawShipDebugStats(Graphics g) {
 		g.setColor(Color.BLUE);
+		int totalSmoke = 0;
 		for (int i = 0; i < ships.size(); i++) {
-			g.drawString("Ship " + i + " smoke:" + ships.get(i).smoke.size(), 10, 80 + (25 * i));
+			g.drawString("Ship " + i + " smoke:" + ships.get(i).smoke.size(), 10, 105 + (25 * i));
+			totalSmoke += ships.get(i).smoke.size();
 		}
+		g.setColor(Color.DARK_GRAY);
+		g.drawString("Total smoke:" + totalSmoke, 10, 80);
 	}
 
 	void purgeShips() {
@@ -85,8 +91,8 @@ public class FancyRocketship extends JPanel implements ActionListener {
 
 	void addShip() {
 		Ship ss = new Ship(gen.nextInt(WIDTH), HEIGHT + 10);
-		ss.speed = gen.nextInt(6) + 1;
-		if(gen.nextInt(10)<2) {
+		//ss.speed = gen.nextInt(6) + 1;
+		if(gen.nextInt(10)<1) {
 			ss.isRainbow = true;
 		}
 		ships.add(ss);
@@ -97,6 +103,7 @@ public class FancyRocketship extends JPanel implements ActionListener {
 		frame.setVisible(true);
 		frame.setPreferredSize(new Dimension(WIDTH, HEIGHT));
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		frame.addKeyListener(this);
 		frame.pack();
 		vxMult = 1 - offsetMax * 0.006;
 		vyMult = 1 - offsetMax * 0.02;
@@ -112,6 +119,28 @@ public class FancyRocketship extends JPanel implements ActionListener {
 	public void actionPerformed(ActionEvent arg0) {
 		// TODO Auto-generated method stub
 		repaint();
+	}
+
+	@Override
+	public void keyPressed(KeyEvent e) {
+		// TODO Auto-generated method stub
+		int keyCode = e.getKeyCode();
+		System.out.println(keyCode);
+		if(keyCode == 10) {
+			Ship.allowColoredSmoke = !Ship.allowColoredSmoke;
+		}
+	}
+
+	@Override
+	public void keyReleased(KeyEvent e) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void keyTyped(KeyEvent e) {
+		// TODO Auto-generated method stub
+		
 	}
 
 }
