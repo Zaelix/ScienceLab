@@ -25,7 +25,7 @@ public class GameCore {
 	}
 	
 	public static void pack() {
-		System.out.println("Packing!");
+		//System.out.println("Packing!");
 		frame.pack();
 	}
 }

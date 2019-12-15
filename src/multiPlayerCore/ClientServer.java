@@ -2,6 +2,7 @@ package multiPlayerCore;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
+import java.io.EOFException;
 import java.io.IOException;
 import java.net.InetAddress;
 import java.net.ServerSocket;
@@ -43,26 +44,49 @@ public class ClientServer {
 				server = new ServerSocket(port);
 				System.out.println("Awaiting client connection...");
 				connection = server.accept();
-				gp.setConnectionText("Connected!");
+				gp.setConnectionText("Connection from Client!");
 			}
 			System.out.println("Getting streams...");
 			out = new DataOutputStream(connection.getOutputStream());
 			in = new DataInputStream(connection.getInputStream());
-			out.flush();
+			// out.flush();
 			gp.gameState = 1;
-			while (connection.isConnected()) {
-				System.out.println("Connected!");
-				String input = in.readUTF();
-				if (!input.equals("")) {
-					commands.add(input);
-				}
-			}
-			connection.close();
+			startConnectionThread();
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
 	}
 
+	public void startConnectionThread() {
+		Thread thread1 = new Thread(() -> {
+			while (connection.isConnected()) {
+				if (isClient) {
+					System.out.println("Client Connected!");
+					send("Client checking in!");
+				} else {
+					System.out.println("Server Connected!");
+				}
+				try {
+					String input = in.readUTF();
+					if (!input.equals("")) {
+						commands.add(input);
+					}
+				} catch (IOException e) {
+					gp.gameState = 2;
+					gp.setConnectionText("Connection lost.");
+				}
+			}
+			try {
+				gp.gameState = 2;
+				connection.close();
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		});
+		thread1.start();
+	}
+	
 	public static String getIP() {
 		InetAddress inetAddress;
 		try {

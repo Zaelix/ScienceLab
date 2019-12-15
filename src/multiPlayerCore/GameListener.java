@@ -14,6 +14,10 @@ public class GameListener implements ActionListener, KeyListener {
 
 	GameListener(GamePanel gp) {
 		this.gp = gp;
+		start();
+	}
+	
+	public void start() {
 		gameTimer = new Timer(1000 / 30, this);
 		gameTimer.start();
 	}
@@ -24,15 +28,17 @@ public class GameListener implements ActionListener, KeyListener {
 		if (e.getSource() instanceof JButton) {
 			JButton b = (JButton) e.getSource();
 			if (b == gp.hostButton) {
+				gp.convertToServerPanel();
 				gp.clientServer.startConnection(false);
 			}
 
 			if (b == gp.clientButton) {
+				gp.convertToClientPanel();
 				gp.clientServer.startConnection(true);
 			}
 		}
-
-		GameCore.pack();
+		//gp.repaint();
+		//GameCore.pack();
 	}
 
 	@Override
