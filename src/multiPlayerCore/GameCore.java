@@ -23,9 +23,9 @@ public class GameCore {
 		frame.setPreferredSize(new Dimension(WIDTH, HEIGHT));
 		frame.pack();
 	}
-	
+
 	public static void pack() {
-		//System.out.println("Packing!");
+		// System.out.println("Packing!");
 		frame.pack();
 	}
 }

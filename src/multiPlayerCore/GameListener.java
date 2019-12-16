@@ -11,15 +11,20 @@ import javax.swing.Timer;
 public class GameListener implements ActionListener, KeyListener {
 	Timer gameTimer;
 	GamePanel gp;
+	ObjectManager manager;
 
 	GameListener(GamePanel gp) {
 		this.gp = gp;
 		start();
 	}
-	
+
 	public void start() {
 		gameTimer = new Timer(1000 / 30, this);
 		gameTimer.start();
+	}
+
+	public void setManager(ObjectManager manager) {
+		this.manager = manager;
 	}
 
 	@Override
@@ -37,14 +42,24 @@ public class GameListener implements ActionListener, KeyListener {
 				gp.clientServer.startConnection(true);
 			}
 		}
-		//gp.repaint();
-		//GameCore.pack();
 	}
 
 	@Override
 	public void keyPressed(KeyEvent e) {
 		// TODO Auto-generated method stub
-
+		System.out.println(e.getKeyCode());
+		if (e.getKeyCode() == 87) {
+			gp.encryptMessage("p1 up");
+		}
+		if (e.getKeyCode() == 83) {
+			gp.encryptMessage("p1 down");
+		}
+		if (e.getKeyCode() == 68) {
+			gp.encryptMessage("p1 right");
+		}
+		if (e.getKeyCode() == 65) {
+			gp.encryptMessage("p1 left");
+		}
 	}
 
 	@Override

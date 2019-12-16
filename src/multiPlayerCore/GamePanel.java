@@ -17,6 +17,8 @@ public class GamePanel extends JPanel implements ActionListener {
 	JButton clientButton;
 	JLabel connStatus = new JLabel("Not connected.");
 
+	ObjectManager manager;
+
 	int gameState = 0;
 
 	GamePanel() {
@@ -33,7 +35,7 @@ public class GamePanel extends JPanel implements ActionListener {
 		this.add(hostButton);
 		this.add(clientButton);
 		this.add(connStatus);
-		gameTimer = new Timer(1000/60, this);
+		gameTimer = new Timer(1000 / 60, this);
 		gameTimer.start();
 		GameCore.pack();
 	}
@@ -42,30 +44,48 @@ public class GamePanel extends JPanel implements ActionListener {
 		this.remove(hostButton);
 		this.remove(clientButton);
 		this.add(new JButton("Disconnect"));
+		manager = new ObjectManager(this, true);
+		listener.setManager(manager);
 	}
 
 	public void convertToClientPanel() {
 		this.removeAll();
+		manager = new ObjectManager(this, false);
+		listener.setManager(manager);
 	}
 
 	public void setConnectionText(String s) {
 		connStatus.setText(s);
-		//repaint();
-		//GameCore.pack();
+		// repaint();
+		// GameCore.pack();
+	}
+
+	public void encryptMessage(String command) {
+		clientServer.send(command);
+		decryptCommand(command);
+	}
+
+	public void decryptCommand(String command) {
+		String[] parts = command.split(" ");
+		if (parts[0].equals("p1")) {
+			if (parts[1].equals("up")) {
+				
+			}
+		}
 	}
 
 	public void paintComponent(Graphics g) {
 		g.setColor(getBackground());
 		g.fillRect(0, 0, GameCore.WIDTH, GameCore.HEIGHT);
-		if (clientServer.isClient && gameState == 1) {
-			g.setColor(getForeground());
-			g.fillRect(100, 100, 100, 100);
+		if (gameState == 1) {
+			manager.draw(g);
 		}
 	}
 
 	@Override
 	public void actionPerformed(ActionEvent arg0) {
 		// TODO Auto-generated method stub
+		manager.update();
 		repaint();
 	}
 

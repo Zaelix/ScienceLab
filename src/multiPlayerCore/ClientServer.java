@@ -51,13 +51,13 @@ public class ClientServer {
 			in = new DataInputStream(connection.getInputStream());
 			// out.flush();
 			gp.gameState = 1;
-			startConnectionThread();
+			startConnectionLoopThread();
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
 	}
 
-	public void startConnectionThread() {
+	public void startConnectionLoopThread() {
 		Thread thread1 = new Thread(() -> {
 			while (connection.isConnected()) {
 				if (isClient) {
