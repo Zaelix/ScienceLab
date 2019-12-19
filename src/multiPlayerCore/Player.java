@@ -4,6 +4,8 @@ import java.awt.Color;
 import java.awt.Graphics;
 
 public class Player {
+	public static int nextNum = 1;
+	public int playerNum;
 	int x;
 	int y;
 	int width;
@@ -15,6 +17,8 @@ public class Player {
 	double speed = 1;
 
 	Player(int x, int y, int width, int height) {
+		playerNum = nextNum;
+		nextNum++;
 		this.x = x;
 		this.y = y;
 		this.width = width;
@@ -87,5 +91,8 @@ public class Player {
 	public void draw(Graphics g) {
 		g.setColor(Color.GREEN);
 		g.fillOval(x, y, width, height);
+		g.setColor(Color.BLACK);
+		g.drawOval(x, y, width, height);
+		g.drawString(playerNum+"", x+width/2-3, y+height/2+3);
 	}
 }
