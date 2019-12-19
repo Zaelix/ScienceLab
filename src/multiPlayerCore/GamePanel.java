@@ -43,7 +43,7 @@ public class GamePanel extends JPanel implements ActionListener {
 	public void convertToServerPanel() {
 		this.remove(hostButton);
 		this.remove(clientButton);
-		this.add(new JButton("Disconnect"));
+		//this.add(new JButton("Disconnect"));
 		manager = new ObjectManager(this, true);
 		listener.setManager(manager);
 	}
@@ -56,8 +56,6 @@ public class GamePanel extends JPanel implements ActionListener {
 
 	public void setConnectionText(String s) {
 		connStatus.setText(s);
-		// repaint();
-		// GameCore.pack();
 	}
 
 	public void encryptMessage(String command) {
@@ -68,9 +66,10 @@ public class GamePanel extends JPanel implements ActionListener {
 	public void decryptCommand(String command) {
 		String[] parts = command.split(" ");
 		if (parts[0].equals("p1")) {
-			if (parts[1].equals("up")) {
-				
-			}
+			manager.player.giveCommand(parts[1]);
+		}
+		if (parts[0].equals("p2")) {
+			manager.player2.giveCommand(parts[1]);
 		}
 	}
 
@@ -85,7 +84,10 @@ public class GamePanel extends JPanel implements ActionListener {
 	@Override
 	public void actionPerformed(ActionEvent arg0) {
 		// TODO Auto-generated method stub
-		manager.update();
+		if (gameState == 1) {
+			manager.update();
+			decryptCommand(clientServer.getNextCommand());
+		}
 		repaint();
 	}
 

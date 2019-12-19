@@ -47,18 +47,21 @@ public class GameListener implements ActionListener, KeyListener {
 	@Override
 	public void keyPressed(KeyEvent e) {
 		// TODO Auto-generated method stub
-		System.out.println(e.getKeyCode());
+		System.out.println("p" + gp.clientServer.playerNum + " pressed " + e.getKeyCode());
 		if (e.getKeyCode() == 87) {
-			gp.encryptMessage("p1 up");
+			gp.encryptMessage("p" + gp.clientServer.playerNum + " up");
 		}
 		if (e.getKeyCode() == 83) {
-			gp.encryptMessage("p1 down");
+			gp.encryptMessage("p" + gp.clientServer.playerNum + " down");
 		}
 		if (e.getKeyCode() == 68) {
-			gp.encryptMessage("p1 right");
+			gp.encryptMessage("p" + gp.clientServer.playerNum + " right");
 		}
 		if (e.getKeyCode() == 65) {
-			gp.encryptMessage("p1 left");
+			gp.encryptMessage("p" + gp.clientServer.playerNum + " left");
+		}
+		if (e.getKeyCode() == 32) {
+			gp.encryptMessage("p" + gp.clientServer.playerNum + " stop");
 		}
 	}
 

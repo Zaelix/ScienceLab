@@ -13,7 +13,6 @@ public class Player {
 	boolean left;
 	boolean right;
 	double speed = 1;
-	String[] commands = {"up", "down", "left", "right"};
 
 	Player(int x, int y, int width, int height) {
 		this.x = x;
@@ -25,26 +24,66 @@ public class Player {
 	public void update() {
 		move();
 	}
-	
+
 	public void move() {
-		if(up) {
-			y-=speed;
+		if (up) {
+			y -= speed;
 		}
-		if(down) {
-			y+=speed;
+		if (down) {
+			y += speed;
 		}
-		if(left) {
-			x-=speed;
+		if (left) {
+			x -= speed;
 		}
-		if(right) {
-			x+=speed;
+		if (right) {
+			x += speed;
 		}
 	}
 
 	public boolean giveCommand(String command) {
-		
-		return true;
+		if (command.equals("up")) {
+			if (up == true) {
+				left = false;
+				right = false;
+			}
+			up = true;
+			down = false;
+			return true;
+		} else if (command.equals("down")) {
+			if (down == true) {
+				left = false;
+				right = false;
+			}
+			up = false;
+			down = true;
+			return true;
+		} else if (command.equals("left")) {
+			if (left == true) {
+				up = false;
+				down = false;
+			}
+			left = true;
+			right = false;
+			return true;
+		} else if (command.equals("right")) {
+			if (right == true) {
+				up = false;
+				down = false;
+			}
+			left = false;
+			right = true;
+			return true;
+		} else if (command.equals("stop")) {
+			up = false;
+			down = false;
+			left = false;
+			right = false;
+			return true;
+		} else {
+			return false;
+		}
 	}
+
 	public void draw(Graphics g) {
 		g.setColor(Color.GREEN);
 		g.fillOval(x, y, width, height);

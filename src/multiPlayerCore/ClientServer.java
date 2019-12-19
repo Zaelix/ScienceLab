@@ -2,13 +2,13 @@ package multiPlayerCore;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
-import java.io.EOFException;
 import java.io.IOException;
 import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.UnknownHostException;
-import java.util.ArrayList;
+import java.util.LinkedList;
+import java.util.Queue;
 
 public class ClientServer {
 	private int port;
@@ -17,11 +17,12 @@ public class ClientServer {
 	private Socket connection;
 	String recievedMessage;
 	boolean isClient;
+	int playerNum;
 
 	DataOutputStream out;
 	DataInputStream in;
 
-	ArrayList<String> commands = new ArrayList<String>();
+	LinkedList<String> commands = new LinkedList<String>();
 	GamePanel gp;
 
 	public ClientServer(String ip, int port, GamePanel gp) {
@@ -34,12 +35,14 @@ public class ClientServer {
 		this.isClient = isClient;
 		try {
 			if (isClient) {
+				playerNum = 2;
 				System.out.println("Seeking host connection...");
 				gp.setConnectionText("Seeking host connection...");
 				GameCore.frame.pack();
 				gp.repaint();
 				connection = new Socket(ip, port);
 			} else {
+				playerNum = 1;
 				gp.setConnectionText("Awaiting client connection...");
 				server = new ServerSocket(port);
 				System.out.println("Awaiting client connection...");
@@ -61,10 +64,10 @@ public class ClientServer {
 		Thread thread1 = new Thread(() -> {
 			while (connection.isConnected()) {
 				if (isClient) {
-					System.out.println("Client Connected!");
-					send("Client checking in!");
+					//System.out.println("Client Connected!");
+					//send("Client checking in!");
 				} else {
-					System.out.println("Server Connected!");
+					//System.out.println("Server Connected!");
 				}
 				try {
 					String input = in.readUTF();
@@ -109,5 +112,12 @@ public class ClientServer {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
+	}
+	
+	public String getNextCommand() {
+		if(commands.size() > 0) {
+			return commands.pop();
+		}
+		else return "";
 	}
 }
