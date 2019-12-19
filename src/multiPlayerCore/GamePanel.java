@@ -56,6 +56,8 @@ public class GamePanel extends JPanel implements ActionListener {
 
 	public void setConnectionText(String s) {
 		connStatus.setText(s);
+		GameCore.frame.pack();
+		paintImmediately(0, 0, getWidth(), getHeight());
 	}
 
 	public void encryptMessage(String command) {

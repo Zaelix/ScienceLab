@@ -45,6 +45,7 @@ public class ClientServer {
 				playerNum = 1;
 				gp.setConnectionText("Awaiting client connection...");
 				server = new ServerSocket(port);
+				System.out.println("Hosting on " + getIP());
 				System.out.println("Awaiting client connection...");
 				connection = server.accept();
 				gp.setConnectionText("Connection from Client!");
