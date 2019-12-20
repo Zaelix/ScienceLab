@@ -31,6 +31,10 @@ public class ClientServer {
 		this.gp = gp;
 	}
 
+	public void setIP(String ip) {
+		this.ip = ip;
+	}
+	
 	public void startConnection(boolean isClient) {
 		this.isClient = isClient;
 		try {

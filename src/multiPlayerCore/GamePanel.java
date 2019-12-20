@@ -1,5 +1,6 @@
 package multiPlayerCore;
 
+import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -7,6 +8,7 @@ import java.awt.event.ActionListener;
 import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.JTextField;
 import javax.swing.Timer;
 
 public class GamePanel extends JPanel implements ActionListener {
@@ -15,6 +17,7 @@ public class GamePanel extends JPanel implements ActionListener {
 	public ClientServer clientServer;
 	JButton hostButton;
 	JButton clientButton;
+	JTextField ipField = new JTextField("localhost");
 	JLabel connStatus = new JLabel("Not connected.");
 
 	ObjectManager manager;
@@ -32,8 +35,10 @@ public class GamePanel extends JPanel implements ActionListener {
 		hostButton.addActionListener(listener);
 		clientButton = new JButton("Start Client");
 		clientButton.addActionListener(listener);
+		ipField.setPreferredSize(new Dimension(100,30));
 		this.add(hostButton);
 		this.add(clientButton);
+		this.add(ipField);
 		this.add(connStatus);
 		gameTimer = new Timer(1000 / 60, this);
 		gameTimer.start();
@@ -43,6 +48,7 @@ public class GamePanel extends JPanel implements ActionListener {
 	public void convertToServerPanel() {
 		this.remove(hostButton);
 		this.remove(clientButton);
+		this.remove(ipField);
 		//this.add(new JButton("Disconnect"));
 		manager = new ObjectManager(this, true);
 		listener.setManager(manager);
@@ -50,6 +56,7 @@ public class GamePanel extends JPanel implements ActionListener {
 
 	public void convertToClientPanel() {
 		this.removeAll();
+		clientServer.setIP(ipField.getText());
 		manager = new ObjectManager(this, false);
 		listener.setManager(manager);
 	}
