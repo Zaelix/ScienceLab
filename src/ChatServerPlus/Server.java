@@ -6,6 +6,7 @@ import java.io.EOFException;
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.util.ArrayList;
 
 import javax.swing.JLabel;
 
@@ -14,6 +15,7 @@ public class Server {
 
 	private ServerSocket server;
 	Socket connection;
+	ArrayList<Socket> connections;
 
 	String recievedMessage;
 

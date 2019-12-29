@@ -35,7 +35,6 @@ public class ChatServerPlus implements ActionListener, KeyListener, MouseWheelLi
 	
 	static Server server;
 	static JLabel connectedLabel;
-	
 	static String font = "verdana";
 	static int fontSize = 2;
 	static int totalLines = 0;

@@ -9,6 +9,7 @@ import java.awt.event.KeyListener;
 import java.awt.event.MouseWheelEvent;
 import java.awt.event.MouseWheelListener;
 import java.util.ArrayList;
+import java.util.Random;
 
 import javax.swing.JButton;
 import javax.swing.JFrame;
@@ -26,6 +27,7 @@ import ChatServerPlus.Server;
 public class ChatApp implements ActionListener, KeyListener, MouseWheelListener {
 	Timer timer;
 	static String name = "client";
+	static String[] randomNames = {"Randy", "James", "Banana", "Zeus", "Athena", "Romulus", "Remus", "Mars", "Apollo", "Julius"};
 	static JFrame frame;
 	static ChatPanel panel;
 	public static JLabel connectedLabel;
@@ -153,6 +155,7 @@ public class ChatApp implements ActionListener, KeyListener, MouseWheelListener 
 		// String ip = JOptionPane.showInputDialog("Enter the IP Address");
 		// int port = Integer.parseInt(JOptionPane.showInputDialog("Enter the port
 		// number"));
+		name = randomNames[new Random().nextInt(randomNames.length)];
 		client = new ClientGreeter();
 		client.start();
 
