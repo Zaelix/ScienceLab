@@ -83,8 +83,9 @@ public class Server {
 	public void retryLostConnection(JLabel connectedLabel) {
 		connectedLabel.setText("Connection lost.");
 		try {
+			server.close();
 			Thread.sleep(1000);
-		} catch (InterruptedException e1) {
+		} catch (InterruptedException | IOException e1) {
 			// TODO Auto-generated catch block
 			e1.printStackTrace();
 		}

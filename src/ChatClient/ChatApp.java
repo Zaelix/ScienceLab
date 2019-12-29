@@ -17,6 +17,8 @@ import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.Timer;
 
+import ChatServerPlus.Server;
+
 /*
  * Using the Click_Chat example, write an application that allows a server computer to chat with a client computer.
  */
@@ -26,10 +28,11 @@ public class ChatApp implements ActionListener, KeyListener, MouseWheelListener 
 	static String name = "client";
 	static JFrame frame;
 	static ChatPanel panel;
+	public static JLabel connectedLabel;
 	static JLabel textView;
 	static JTextField textInput;
 	static JButton sender;
-	ClientGreeter client;
+	static ClientGreeter client;
 	static String font = "verdana";
 	static int fontSize = 2;
 	static int totalLines = 0;
@@ -49,6 +52,12 @@ public class ChatApp implements ActionListener, KeyListener, MouseWheelListener 
 		JPanel textPanel = new JPanel();
 		textPanel.setPreferredSize(new Dimension(500, 750));
 		textPanel.setBackground(Color.BLACK);
+
+		connectedLabel = new JLabel("Waiting for Connection");
+		connectedLabel.setBackground(Color.white);
+		connectedLabel.setOpaque(true);
+		panel.add(connectedLabel);
+		
 		panel.add(textPanel);
 		textInput = new JTextField();
 		textInput.setPreferredSize(new Dimension(300, 40));
@@ -69,6 +78,7 @@ public class ChatApp implements ActionListener, KeyListener, MouseWheelListener 
 	static public void rebuildFrame() {
 		frame.remove(panel);
 		panel = new ChatPanel();
+		panel.add(connectedLabel);
 		panel.add(createMessagesPanel());
 		panel.add(textInput);
 		panel.add(sender);
@@ -151,6 +161,14 @@ public class ChatApp implements ActionListener, KeyListener, MouseWheelListener 
 			// I need to make the sysos of input go into the jframe
 		}
 
+	}
+	
+	public static void restartClient() {
+		System.out.println("Restarting Client...");
+		client = new ClientGreeter();
+		connectedLabel.setText("Attempting to Connect...");
+		System.out.println("Client recreated, attempting connections...");
+		client.start();
 	}
 
 	public static void addMessage(String s) {
