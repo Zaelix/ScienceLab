@@ -26,14 +26,16 @@ import ChatClient.ChatPanel;
 
 public class ChatServerPlus implements ActionListener, KeyListener, MouseWheelListener {
 	Timer timer;
-	static String name = "server";
+	static String name = "Server";
 	static JFrame frame;
 	static ChatPanel panel;
 	static JLabel textView;
 	static JTextField textInput;
 	static JButton sender;
 	
-	static Server server;
+	static int clientCount = 0;
+	static ArrayList<HubServer> servers = new ArrayList<HubServer>();
+	
 	static JLabel connectedLabel;
 	static String font = "verdana";
 	static int fontSize = 2;
@@ -153,18 +155,25 @@ public class ChatServerPlus implements ActionListener, KeyListener, MouseWheelLi
 		// String ip = JOptionPane.showInputDialog("Enter the IP Address");
 		// int port = Integer.parseInt(JOptionPane.showInputDialog("Enter the port
 		// number"));
-		server = new Server(80);
-		connectedLabel.setText("Unconnected.");
-		server.start(connectedLabel);
-
+//		server = new HubServer(80, 0);
+//		connectedLabel.setText("Unconnected.");
+//		server.start(connectedLabel);
+startServer();
 	}
 	
-	public static void restartServer() {
+	public void startServer() {
+		
+		servers.add(new HubServer(80+clientCount, clientCount));
+		connectedLabel.setText("Unconnected.");
+		servers.get(servers.size()-1).start(connectedLabel);
+	}
+	
+	public static void restartServer(int port, int serverNum) {
 		System.out.println("Restarting server...");
-		server = new Server(80);
+		servers.set(serverNum,new HubServer(port, serverNum));
 		connectedLabel.setText("Unconnected.");
 		System.out.println("Server recreated, attempting connections...");
-		server.start(connectedLabel);
+		servers.get(serverNum).start(connectedLabel);
 	}
 
 	public static void addMessage(String s) {
@@ -176,14 +185,31 @@ public class ChatServerPlus implements ActionListener, KeyListener, MouseWheelLi
 //		}
 		rebuildFrame();
 	}
+	
+	private void sendMessage() {
+		sendToClients(-1);
+		addMessage(name + ": " + textInput.getText());
+		textInput.setText("");
+	}
+	public void sendToClients(int source) {
+		for(HubServer s : servers) {
+			if(s.getServerNumber() != source) {
+				s.send(name + ": " + textInput.getText());
+			}
+		}
+	}
 
+	public static void addClient() {
+		clientCount++;
+	}
+	public static void removeClient() {
+		clientCount--;
+	}
 	@Override
 	public void actionPerformed(ActionEvent e) {
 		// TODO Auto-generated method stub
 		if (e.getSource().equals(sender)) {
-			server.send(name + ": " + textInput.getText());
-			addMessage(name + ": " + textInput.getText());
-			textInput.setText("");
+			sendMessage();
 		}
 		panel.repaint();
 	}
@@ -192,9 +218,7 @@ public class ChatServerPlus implements ActionListener, KeyListener, MouseWheelLi
 	public void keyPressed(KeyEvent e) {
 		// TODO Auto-generated method stub
 		if (e.getKeyCode() == 10) {
-			server.send(name + ": " + textInput.getText());
-			addMessage(name + ": " + textInput.getText());
-			textInput.setText("");
+			sendMessage();
 		}
 	}
 

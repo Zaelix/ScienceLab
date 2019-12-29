@@ -10,10 +10,10 @@ import java.util.ArrayList;
 
 import javax.swing.JLabel;
 
-public class Server {
+public class HubServer {
 	private int port;
 
-	private ServerSocket server;
+	private ServerSocket serverSocket;
 	Socket connection;
 
 	String recievedMessage;
@@ -21,16 +21,18 @@ public class Server {
 	DataOutputStream out;
 	DataInputStream in;
 
-	public Server(int port) {
+	private int serverNum;
+	
+	public HubServer(int port, int serverNum) {
 		this.port = port;
-
+		this.serverNum = serverNum;
 		recievedMessage = "";
 	}
 
 	public void start(JLabel connectedLabel) {
 		try {
 			System.out.println("Creating ServerSocket...");
-			server = new ServerSocket(port);
+			serverSocket = new ServerSocket(port);
 			System.out.println("ServerSocket created!");
 			// connectedLabel.setText("Waiting for connection...");
 			Thread thread1 = new Thread(() -> {
@@ -50,9 +52,10 @@ public class Server {
 				}
 			});
 			thread1.start();
-			connection = server.accept();
+			connection = serverSocket.accept();
 			thread1.stop();
-			connectedLabel.setText("Connected!");
+			connectedLabel.setText("Client Connected!");
+			ChatServerPlus.addClient();
 
 			out = new DataOutputStream(connection.getOutputStream());
 			in = new DataInputStream(connection.getInputStream());
@@ -71,8 +74,9 @@ public class Server {
 			}
 		} catch (Exception e) {
 			System.out.println("Connection lost.");
+			ChatServerPlus.removeClient();
 			try {
-				server.close();
+				serverSocket.close();
 			} catch (IOException e1) {
 				// TODO Auto-generated catch block
 				e1.printStackTrace();
@@ -84,13 +88,13 @@ public class Server {
 	public void retryLostConnection(JLabel connectedLabel) {
 		connectedLabel.setText("Connection lost.");
 		try {
-			server.close();
+			serverSocket.close();
 			Thread.sleep(1000);
 		} catch (InterruptedException | IOException e1) {
 			// TODO Auto-generated catch block
 			e1.printStackTrace();
 		}
-		ChatServerPlus.restartServer(port, 0);
+		ChatServerPlus.restartServer(port, serverNum);
 	}
 
 	public void send(String s) {
@@ -102,5 +106,9 @@ public class Server {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
+	}
+	
+	public int getServerNumber() {
+		return serverNum;
 	}
 }
