@@ -12,7 +12,7 @@ public class ChatMessage extends JPanel {
 	String messsage;
 	Color color;
 	int lines = 0;
-	int pixelHeight = 0;
+	public int pixelHeight = 0;
 	JLabel label;
 
 	public ChatMessage(String string) {
