@@ -8,6 +8,8 @@ import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.awt.event.MouseWheelEvent;
 import java.awt.event.MouseWheelListener;
+import java.io.IOException;
+import java.net.ServerSocket;
 import java.util.ArrayList;
 
 import javax.swing.JButton;
@@ -44,6 +46,7 @@ public class ChatServerPlus implements ActionListener, KeyListener, MouseWheelLi
 	static int startMessage = 0;
 	static ArrayList<String> messages = new ArrayList<String>();
 
+	static ServerSocket serverSocket;
 	int connectionTimer;
 	int connectionCooldown = 60;
 
@@ -55,6 +58,12 @@ public class ChatServerPlus implements ActionListener, KeyListener, MouseWheelLi
 
 	public void makeFrame() {
 		timer = new Timer(1000 / 30, this);
+		try {
+			serverSocket = new ServerSocket(80);
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 		frame = new JFrame();
 		panel = new ChatPanel();
 		JPanel textPanel = new JPanel();
@@ -162,7 +171,7 @@ public class ChatServerPlus implements ActionListener, KeyListener, MouseWheelLi
 
 	public void startServer() {
 		connectionTimer = 0;
-		servers.add(new HubServer(80 + servers.size(), servers.size()));
+		servers.add(new HubServer(80 + servers.size(), servers.size(), serverSocket));
 		System.out.println("Servers: " + servers.size());
 		//servers.get(servers.size() - 1).start();
 		Thread thread1 = new Thread(() -> {
@@ -174,7 +183,7 @@ public class ChatServerPlus implements ActionListener, KeyListener, MouseWheelLi
 
 	public static void restartServer(int port, int serverNum) {
 		System.out.println("Restarting server...");
-		servers.set(serverNum, new HubServer(port, serverNum));
+		servers.set(serverNum, new HubServer(port, serverNum, serverSocket));
 		connectedLabel.setText(clientCount + " Clients Connected.");
 		System.out.println("Server recreated, attempting connections...");
 		Thread thread1 = new Thread(() -> {
@@ -199,23 +208,24 @@ public class ChatServerPlus implements ActionListener, KeyListener, MouseWheelLi
 		return ports;
 	}
 
-	public static void addMessage(String s) {
+	public static void addMessage(String s, int serverNum) {
 		messages.add(s);
+
+		sendToClients(s, serverNum);
 		System.out.println(s);
 		startMessage++;
 		rebuildFrame();
 	}
 
 	private void sendMessage() {
-		sendToClients(-1);
-		addMessage(name + ": " + textInput.getText());
+		addMessage(name + ": " + textInput.getText(), -1);
 		textInput.setText("");
 	}
 
-	public void sendToClients(int source) {
+	public static void sendToClients(String message, int source) {
 		for (HubServer s : servers) {
 			if (s.getServerNumber() != source) {
-				s.send(name + ": " + textInput.getText());
+				s.send(message);
 			}
 		}
 	}

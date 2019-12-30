@@ -23,39 +23,22 @@ public class HubServer {
 
 	private int serverNum;
 	
-	public HubServer(int port, int serverNum) {
+	public HubServer(int port, int serverNum, ServerSocket sock) {
 		this.port = port;
 		this.serverNum = serverNum;
+		this.serverSocket = sock;
 		recievedMessage = "";
 	}
 
 	public void start() {
 		try {
 			System.out.println("Creating ServerSocket...");
-			serverSocket = new ServerSocket(port);
+			//serverSocket = new ServerSocket(port);
 			status = 1;
-			System.out.println(serverSocket.isBound());
 			System.out.println("ServerSocket created!");
-//			Thread thread1 = new Thread(() -> {
-//				for (int i = 0; true; i++) {
-//					try {
-//						Thread.sleep(500);
-//					} catch (InterruptedException e) {
-//						// TODO Auto-generated catch block
-//						e.printStackTrace();
-//					}
-//					if (i % 3 == 0)
-//						connectedLabel.setText("Waiting for connection.");
-//					else if (i % 3 == 1)
-//						connectedLabel.setText("Waiting for connection..");
-//					else if (i % 3 == 2)
-//						connectedLabel.setText("Waiting for connection...");
-//				}
-//			});
-			//thread1.start();
+
 			connection = serverSocket.accept();
 			status = 2;
-			//thread1.stop();
 
 			out = new DataOutputStream(connection.getOutputStream());
 			in = new DataInputStream(connection.getInputStream());
@@ -66,7 +49,7 @@ public class HubServer {
 				try {
 					recievedMessage = in.readUTF();
 					
-					ChatServerPlus.addMessage(recievedMessage);
+					ChatServerPlus.addMessage(recievedMessage, serverNum);
 				} catch (EOFException e) {
 					retryLostConnection();
 					break;
@@ -77,7 +60,6 @@ public class HubServer {
 			try {
 				serverSocket.close();
 			} catch (IOException e1) {
-				// TODO Auto-generated catch block
 				e1.printStackTrace();
 			}
 			retryLostConnection();
