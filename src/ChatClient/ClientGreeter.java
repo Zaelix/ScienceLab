@@ -21,6 +21,8 @@ public class ClientGreeter {
 		int port = 80;
 		try {
 			sock = new Socket(ip, port);
+			System.out.println(sock.isBound());
+			System.out.println(sock.isConnected());
 			output = new DataOutputStream(sock.getOutputStream());
 
 			input = new DataInputStream(sock.getInputStream());

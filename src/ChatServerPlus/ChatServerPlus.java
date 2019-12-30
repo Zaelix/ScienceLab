@@ -32,16 +32,20 @@ public class ChatServerPlus implements ActionListener, KeyListener, MouseWheelLi
 	static JLabel textView;
 	static JTextField textInput;
 	static JButton sender;
-	
+
 	static int clientCount = 0;
 	static ArrayList<HubServer> servers = new ArrayList<HubServer>();
-	
+	static ArrayList<Thread> threads = new ArrayList<Thread>();
+
 	static JLabel connectedLabel;
 	static String font = "verdana";
 	static int fontSize = 2;
 	static int totalLines = 0;
 	static int startMessage = 0;
 	static ArrayList<String> messages = new ArrayList<String>();
+
+	int connectionTimer;
+	int connectionCooldown = 60;
 
 	public static void main(String[] args) {
 		ChatServerPlus app = new ChatServerPlus();
@@ -117,7 +121,6 @@ public class ChatServerPlus implements ActionListener, KeyListener, MouseWheelLi
 			}
 			panel.add(label);
 		}
-		System.out.println("Pixel Count: " + totalLines);
 		panel = trimMessageList(panel);
 		panel.setPreferredSize(new Dimension(500, 750));
 		panel.setBackground(Color.BLACK);
@@ -130,7 +133,6 @@ public class ChatServerPlus implements ActionListener, KeyListener, MouseWheelLi
 			totalLines -= message.pixelHeight + 5;
 			messages.remove(0);
 		}
-		System.out.println("Post-Trim: " + totalLines);
 		return panel;
 	}
 
@@ -155,45 +157,64 @@ public class ChatServerPlus implements ActionListener, KeyListener, MouseWheelLi
 		// String ip = JOptionPane.showInputDialog("Enter the IP Address");
 		// int port = Integer.parseInt(JOptionPane.showInputDialog("Enter the port
 		// number"));
-//		server = new HubServer(80, 0);
-//		connectedLabel.setText("Unconnected.");
-//		server.start(connectedLabel);
-startServer();
+		startServer();
 	}
-	
+
 	public void startServer() {
-		
-		servers.add(new HubServer(80+clientCount, clientCount));
-		connectedLabel.setText("Unconnected.");
-		servers.get(servers.size()-1).start(connectedLabel);
+		connectionTimer = 0;
+		servers.add(new HubServer(80 + servers.size(), servers.size()));
+		System.out.println("Servers: " + servers.size());
+		//servers.get(servers.size() - 1).start();
+		Thread thread1 = new Thread(() -> {
+			servers.get(servers.size() - 1).start();
+		});
+		// threads.add(thread1);
+		thread1.start();
 	}
-	
+
 	public static void restartServer(int port, int serverNum) {
 		System.out.println("Restarting server...");
-		servers.set(serverNum,new HubServer(port, serverNum));
-		connectedLabel.setText("Unconnected.");
+		servers.set(serverNum, new HubServer(port, serverNum));
+		connectedLabel.setText(clientCount + " Clients Connected.");
 		System.out.println("Server recreated, attempting connections...");
-		servers.get(serverNum).start(connectedLabel);
+		Thread thread1 = new Thread(() -> {
+			servers.get(serverNum).start();
+		});
+		thread1.start();
+	}
+
+	ArrayList<Integer> getOpenPorts() {
+		ArrayList<Integer> ports = new ArrayList<Integer>();
+		int clients = 0;
+		for (HubServer s : servers) {
+			if (s.status == 1) {
+				ports.add(s.getServerPort());
+			}
+			if (s.status == 2) {
+				clients++;
+			}
+		}
+		clientCount = clients;
+		connectedLabel.setText(clientCount + " Clients Connected.");
+		return ports;
 	}
 
 	public static void addMessage(String s) {
 		messages.add(s);
 		System.out.println(s);
 		startMessage++;
-//		if (messages.size() > maxLines) {
-//			messages.remove(0);
-//		}
 		rebuildFrame();
 	}
-	
+
 	private void sendMessage() {
 		sendToClients(-1);
 		addMessage(name + ": " + textInput.getText());
 		textInput.setText("");
 	}
+
 	public void sendToClients(int source) {
-		for(HubServer s : servers) {
-			if(s.getServerNumber() != source) {
+		for (HubServer s : servers) {
+			if (s.getServerNumber() != source) {
 				s.send(name + ": " + textInput.getText());
 			}
 		}
@@ -202,14 +223,23 @@ startServer();
 	public static void addClient() {
 		clientCount++;
 	}
+
 	public static void removeClient() {
 		clientCount--;
 	}
+
 	@Override
 	public void actionPerformed(ActionEvent e) {
 		// TODO Auto-generated method stub
 		if (e.getSource().equals(sender)) {
 			sendMessage();
+		}
+
+		connectionTimer++;
+
+		ArrayList<Integer> ports = getOpenPorts();
+		if (connectionTimer > connectionCooldown && ports.size() == 0) {
+			startServer();
 		}
 		panel.repaint();
 	}

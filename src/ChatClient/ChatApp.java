@@ -117,7 +117,6 @@ public class ChatApp implements ActionListener, KeyListener, MouseWheelListener 
 			}
 			panel.add(label);
 		}
-		System.out.println("Pixel Count: " + totalLines);
 		panel = trimMessageList(panel);
 		panel.setPreferredSize(new Dimension(500, 750));
 		panel.setBackground(Color.BLACK);
@@ -130,7 +129,6 @@ public class ChatApp implements ActionListener, KeyListener, MouseWheelListener 
 			totalLines -= message.pixelHeight + 5;
 			messages.remove(0);
 		}
-		System.out.println("Post-Trim: " + totalLines);
 		return panel;
 	}
 
@@ -160,8 +158,7 @@ public class ChatApp implements ActionListener, KeyListener, MouseWheelListener 
 		client.start();
 
 		while (client.sock.isConnected()) {
-			// work here
-			// I need to make the sysos of input go into the jframe
+			
 		}
 
 	}
@@ -178,15 +175,11 @@ public class ChatApp implements ActionListener, KeyListener, MouseWheelListener 
 		messages.add(s);
 		System.out.println(s);
 		startMessage++;
-//		if (messages.size() > maxLines) {
-//			messages.remove(0);
-//		}
 		rebuildFrame();
 	}
 
 	@Override
 	public void actionPerformed(ActionEvent e) {
-		// TODO Auto-generated method stub
 		if (e.getSource().equals(sender)) {
 			client.send(name + ": " + textInput.getText());
 			addMessage(name + ": " + textInput.getText());
@@ -197,7 +190,6 @@ public class ChatApp implements ActionListener, KeyListener, MouseWheelListener 
 
 	@Override
 	public void keyPressed(KeyEvent e) {
-		// TODO Auto-generated method stub
 		if (e.getKeyCode() == 10) {
 			client.send(name + ": " + textInput.getText());
 			addMessage(name + ": " + textInput.getText());

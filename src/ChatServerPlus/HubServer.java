@@ -12,8 +12,8 @@ import javax.swing.JLabel;
 
 public class HubServer {
 	private int port;
-
-	private ServerSocket serverSocket;
+	int status = 0;
+	public ServerSocket serverSocket;
 	Socket connection;
 
 	String recievedMessage;
@@ -29,33 +29,33 @@ public class HubServer {
 		recievedMessage = "";
 	}
 
-	public void start(JLabel connectedLabel) {
+	public void start() {
 		try {
 			System.out.println("Creating ServerSocket...");
 			serverSocket = new ServerSocket(port);
+			status = 1;
+			System.out.println(serverSocket.isBound());
 			System.out.println("ServerSocket created!");
-			// connectedLabel.setText("Waiting for connection...");
-			Thread thread1 = new Thread(() -> {
-				for (int i = 0; true; i++) {
-					try {
-						Thread.sleep(500);
-					} catch (InterruptedException e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
-					}
-					if (i % 3 == 0)
-						connectedLabel.setText("Waiting for connection.");
-					else if (i % 3 == 1)
-						connectedLabel.setText("Waiting for connection..");
-					else if (i % 3 == 2)
-						connectedLabel.setText("Waiting for connection...");
-				}
-			});
-			thread1.start();
+//			Thread thread1 = new Thread(() -> {
+//				for (int i = 0; true; i++) {
+//					try {
+//						Thread.sleep(500);
+//					} catch (InterruptedException e) {
+//						// TODO Auto-generated catch block
+//						e.printStackTrace();
+//					}
+//					if (i % 3 == 0)
+//						connectedLabel.setText("Waiting for connection.");
+//					else if (i % 3 == 1)
+//						connectedLabel.setText("Waiting for connection..");
+//					else if (i % 3 == 2)
+//						connectedLabel.setText("Waiting for connection...");
+//				}
+//			});
+			//thread1.start();
 			connection = serverSocket.accept();
-			thread1.stop();
-			connectedLabel.setText("Client Connected!");
-			ChatServerPlus.addClient();
+			status = 2;
+			//thread1.stop();
 
 			out = new DataOutputStream(connection.getOutputStream());
 			in = new DataInputStream(connection.getInputStream());
@@ -68,25 +68,23 @@ public class HubServer {
 					
 					ChatServerPlus.addMessage(recievedMessage);
 				} catch (EOFException e) {
-					retryLostConnection(connectedLabel);
+					retryLostConnection();
 					break;
 				}
 			}
 		} catch (Exception e) {
 			System.out.println("Connection lost.");
-			ChatServerPlus.removeClient();
 			try {
 				serverSocket.close();
 			} catch (IOException e1) {
 				// TODO Auto-generated catch block
 				e1.printStackTrace();
 			}
-			retryLostConnection(connectedLabel);
+			retryLostConnection();
 		}
 	}
 
-	public void retryLostConnection(JLabel connectedLabel) {
-		connectedLabel.setText("Connection lost.");
+	public void retryLostConnection() {
 		try {
 			serverSocket.close();
 			Thread.sleep(1000);
@@ -110,5 +108,9 @@ public class HubServer {
 	
 	public int getServerNumber() {
 		return serverNum;
+	}
+	
+	public int getServerPort() {
+		return port;
 	}
 }
