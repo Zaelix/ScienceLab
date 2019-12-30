@@ -27,16 +27,12 @@ public class HubServer {
 		this.port = port;
 		this.serverNum = serverNum;
 		this.serverSocket = sock;
+		status = 1;
 		recievedMessage = "";
 	}
 
 	public void start() {
 		try {
-			System.out.println("Creating ServerSocket...");
-			//serverSocket = new ServerSocket(port);
-			status = 1;
-			System.out.println("ServerSocket created!");
-
 			connection = serverSocket.accept();
 			status = 2;
 
