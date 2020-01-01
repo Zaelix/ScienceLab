@@ -63,7 +63,7 @@ public class Server {
 				try {
 					recievedMessage = in.readUTF();
 					
-					ChatServerPlus.addMessage(recievedMessage);
+					ChatServerPlus.addMessage(recievedMessage, -1);
 				} catch (EOFException e) {
 					retryLostConnection(connectedLabel);
 					break;
