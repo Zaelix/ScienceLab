@@ -22,6 +22,17 @@ public class ChatPanel extends JPanel {
 			drawPattern(g);
 		}
 	}
+	
+	public static void setTheme(int newTheme) {
+		theme = newTheme;
+	}
+	
+	public static void changeTheme() {
+		theme++;
+		if(theme > 2) {
+			theme = 0;
+		}
+	}
 
 	public void drawStatic(Graphics g) {
 		int red = 0;

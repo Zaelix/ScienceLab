@@ -42,7 +42,9 @@ public class ChatServerPlus implements ActionListener, KeyListener, MouseWheelLi
 	static ArrayList<Thread> threads = new ArrayList<Thread>();
 
 	static JLabel connectedLabel;
-	static String font = "verdana";
+	//static String font = "verdana";
+	static int font = 0;
+	static String[] fonts = {"Verdana", "Garamond", "Cambria", "Courier", "Times"};
 	static int fontSize = 2;
 	static int totalLines = 0;
 	static int startMessage = 0;
@@ -82,6 +84,7 @@ public class ChatServerPlus implements ActionListener, KeyListener, MouseWheelLi
 		sender.addActionListener(this);
 		panel.add(textInput);
 		panel.add(sender);
+		panel.add(createDirectionsLabel());
 		frame.add(panel);
 		frame.setPreferredSize(new Dimension(520, 1000));
 		frame.setVisible(true);
@@ -99,6 +102,7 @@ public class ChatServerPlus implements ActionListener, KeyListener, MouseWheelLi
 		panel.add(createMessagesPanel());
 		panel.add(textInput);
 		panel.add(sender);
+		panel.add(createDirectionsLabel());
 		frame.add(panel);
 		textInput.requestFocus();
 		frame.pack();
@@ -119,7 +123,7 @@ public class ChatServerPlus implements ActionListener, KeyListener, MouseWheelLi
 			String s = msgs[i];
 			Object[] objs = splitIntoLines(s, 70);
 			s = (String) objs[0];
-			ChatMessage label = new ChatMessage("<html><pre><font face=\"" + font + "\" size=\"" + fontSize
+			ChatMessage label = new ChatMessage("<html><pre><font face=\"" + fonts[font] + "\" size=\"" + fontSize
 					+ "\" color=\"rgb(255,0,0)\">" + s + "</font></pre></html>");
 			label.setLines((int) objs[1]);
 			label.init();
@@ -138,6 +142,13 @@ public class ChatServerPlus implements ActionListener, KeyListener, MouseWheelLi
 		return panel;
 	}
 
+	static JLabel createDirectionsLabel() {
+		JLabel label = new JLabel();
+		label.setText("<html>Page Up: Change theme <br/>Page Down: Change font</html>");
+		label.setPreferredSize(new Dimension(490, 100));
+		return label;
+	}
+	
 	public static JPanel trimMessageList(JPanel panel) {
 		while (totalLines > 9000) {
 			ChatMessage message = (ChatMessage) panel.getComponent(0);
@@ -176,7 +187,7 @@ public class ChatServerPlus implements ActionListener, KeyListener, MouseWheelLi
 		connectionTimer = 0;
 		servers.add(new HubServer(80 + servers.size(), servers.size(), serverSocket));
 		System.out.println("Servers: " + servers.size());
-		//servers.get(servers.size() - 1).start();
+		// servers.get(servers.size() - 1).start();
 		Thread thread1 = new Thread(() -> {
 			servers.get(servers.size() - 1).start();
 		});
@@ -240,6 +251,7 @@ public class ChatServerPlus implements ActionListener, KeyListener, MouseWheelLi
 	public static void removeClient() {
 		clientCount--;
 	}
+
 	public static String getIP() {
 		InetAddress inetAddress;
 		try {
@@ -252,6 +264,7 @@ public class ChatServerPlus implements ActionListener, KeyListener, MouseWheelLi
 		}
 		return "IP Not Found";
 	}
+
 	@Override
 	public void actionPerformed(ActionEvent e) {
 		// TODO Auto-generated method stub
@@ -270,9 +283,20 @@ public class ChatServerPlus implements ActionListener, KeyListener, MouseWheelLi
 
 	@Override
 	public void keyPressed(KeyEvent e) {
-		// TODO Auto-generated method stub
+		System.out.println(e.getKeyCode());
 		if (e.getKeyCode() == 10) {
 			sendMessage();
+		}
+		if (e.getKeyCode() == 33) {
+			ChatPanel.changeTheme();
+		}
+		if (e.getKeyCode() == 34) {
+			font++;
+			if(font >= fonts.length) {
+				font = 0;
+			}
+			System.out.println(fonts[font]);
+			rebuildFrame();
 		}
 	}
 
