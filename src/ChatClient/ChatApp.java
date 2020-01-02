@@ -27,11 +27,12 @@ import ChatServerPlus.Server;
 public class ChatApp implements ActionListener, KeyListener, MouseWheelListener {
 	Timer timer;
 	static String name = "client";
-	static String[] randomNames = {"Randy", "James", "Banana", "Zeus", "Athena", "Romulus", "Remus", "Mars", "Apollo", 
-			"Julius", "Kirito", "Asuna", "Main", "Nessie", "Luther", "Kakarot", "Link", "Zelda", "Fox", "Mario", "Bowser", 
-			"Lucario", "Pikachu", "Squirtle", "Anakin", "Obi-Wan", "Yoda", "Baby Yoda", "Jar-Jar", "Aquaman", "Baymax", "Bigfoot", 
-			"Yeti", "Bond", "Han Solo", "Rocky", "Spock", "Picard", "Joker", "Batman", "Kermit", "Zorro", "Aragorn", "Gandalf", 
-			"Bilbo", "Frodo", "Isildur", "Pippin", "Gollum", "Saruman", "Sauron", "Shelob"};
+	static String[] randomNames = { "Randy", "James", "Banana", "Zeus", "Athena", "Romulus", "Remus", "Mars", "Apollo",
+			"Julius", "Kirito", "Asuna", "Main", "Nessie", "Luther", "Kakarot", "Link", "Zelda", "Fox", "Mario",
+			"Bowser", "Lucario", "Pikachu", "Squirtle", "Anakin", "Obi-Wan", "Yoda", "Baby Yoda", "Jar-Jar", "Aquaman",
+			"Baymax", "Bigfoot", "Yeti", "Bond", "Han Solo", "Rocky", "Spock", "Picard", "Joker", "Batman", "Kermit",
+			"Zorro", "Aragorn", "Gandalf", "Bilbo", "Frodo", "Isildur", "Pippin", "Gollum", "Saruman", "Sauron",
+			"Shelob" };
 	static JFrame frame;
 	static ChatPanel panel;
 	public static JLabel connectedLabel;
@@ -39,7 +40,8 @@ public class ChatApp implements ActionListener, KeyListener, MouseWheelListener 
 	static JTextField textInput;
 	static JButton sender;
 	static ClientGreeter client;
-	static String font = "verdana";
+	static int font = 0;
+	static String[] fonts = { "Verdana", "Garamond", "Cambria", "Courier", "Times" };
 	static int fontSize = 2;
 	static int totalLines = 0;
 	static int startMessage = 0;
@@ -63,7 +65,7 @@ public class ChatApp implements ActionListener, KeyListener, MouseWheelListener 
 		connectedLabel.setBackground(Color.white);
 		connectedLabel.setOpaque(true);
 		panel.add(connectedLabel);
-		
+
 		panel.add(textPanel);
 		textInput = new JTextField();
 		textInput.setPreferredSize(new Dimension(300, 40));
@@ -71,6 +73,7 @@ public class ChatApp implements ActionListener, KeyListener, MouseWheelListener 
 		sender.addActionListener(this);
 		panel.add(textInput);
 		panel.add(sender);
+		panel.add(createDirectionsLabel());
 		frame.add(panel);
 		frame.setPreferredSize(new Dimension(520, 1000));
 		frame.setVisible(true);
@@ -88,6 +91,7 @@ public class ChatApp implements ActionListener, KeyListener, MouseWheelListener 
 		panel.add(createMessagesPanel());
 		panel.add(textInput);
 		panel.add(sender);
+		panel.add(createDirectionsLabel());
 		frame.add(panel);
 		textInput.requestFocus();
 		frame.pack();
@@ -108,7 +112,7 @@ public class ChatApp implements ActionListener, KeyListener, MouseWheelListener 
 			String s = msgs[i];
 			Object[] objs = splitIntoLines(s, 70);
 			s = (String) objs[0];
-			ChatMessage label = new ChatMessage("<html><pre><font face=\"" + font + "\" size=\"" + fontSize
+			ChatMessage label = new ChatMessage("<html><pre><font face=\"" + fonts[font] + "\" size=\"" + fontSize
 					+ "\" color=\"rgb(255,0,0)\">" + s + "</font></pre></html>");
 			label.setLines((int) objs[1]);
 			label.init();
@@ -125,6 +129,13 @@ public class ChatApp implements ActionListener, KeyListener, MouseWheelListener 
 		panel.setPreferredSize(new Dimension(500, 750));
 		panel.setBackground(Color.BLACK);
 		return panel;
+	}
+
+	static JLabel createDirectionsLabel() {
+		JLabel label = new JLabel();
+		label.setText("<html>Page Up: Change theme <br/>Page Down: Change font</html>");
+		label.setPreferredSize(new Dimension(490, 100));
+		return label;
 	}
 
 	public static JPanel trimMessageList(JPanel panel) {
@@ -162,11 +173,11 @@ public class ChatApp implements ActionListener, KeyListener, MouseWheelListener 
 		client.start();
 
 		while (client.sock.isConnected()) {
-			
+
 		}
 
 	}
-	
+
 	public static void restartClient() {
 		System.out.println("Restarting Client...");
 		client = new ClientGreeter();
@@ -198,6 +209,17 @@ public class ChatApp implements ActionListener, KeyListener, MouseWheelListener 
 			client.send(name + ": " + textInput.getText());
 			addMessage(name + ": " + textInput.getText());
 			textInput.setText("");
+		}
+		if (e.getKeyCode() == 33) {
+			ChatPanel.changeTheme();
+		}
+		if (e.getKeyCode() == 34) {
+			font++;
+			if (font >= fonts.length) {
+				font = 0;
+			}
+			System.out.println(fonts[font]);
+			rebuildFrame();
 		}
 	}
 
