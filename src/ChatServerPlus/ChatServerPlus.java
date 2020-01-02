@@ -9,7 +9,9 @@ import java.awt.event.KeyListener;
 import java.awt.event.MouseWheelEvent;
 import java.awt.event.MouseWheelListener;
 import java.io.IOException;
+import java.net.InetAddress;
 import java.net.ServerSocket;
+import java.net.UnknownHostException;
 import java.util.ArrayList;
 
 import javax.swing.JButton;
@@ -166,6 +168,7 @@ public class ChatServerPlus implements ActionListener, KeyListener, MouseWheelLi
 		// String ip = JOptionPane.showInputDialog("Enter the IP Address");
 		// int port = Integer.parseInt(JOptionPane.showInputDialog("Enter the port
 		// number"));
+		System.out.println(getIP());
 		startServer();
 	}
 
@@ -237,7 +240,18 @@ public class ChatServerPlus implements ActionListener, KeyListener, MouseWheelLi
 	public static void removeClient() {
 		clientCount--;
 	}
-
+	public static String getIP() {
+		InetAddress inetAddress;
+		try {
+			inetAddress = InetAddress.getLocalHost();
+			System.out.println("Host Name:- " + inetAddress.getHostName());
+			return "IP Address:- " + inetAddress.getHostAddress();
+		} catch (UnknownHostException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return "IP Not Found";
+	}
 	@Override
 	public void actionPerformed(ActionEvent e) {
 		// TODO Auto-generated method stub
