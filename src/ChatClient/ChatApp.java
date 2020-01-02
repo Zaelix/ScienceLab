@@ -27,7 +27,11 @@ import ChatServerPlus.Server;
 public class ChatApp implements ActionListener, KeyListener, MouseWheelListener {
 	Timer timer;
 	static String name = "client";
-	static String[] randomNames = {"Randy", "James", "Banana", "Zeus", "Athena", "Romulus", "Remus", "Mars", "Apollo", "Julius"};
+	static String[] randomNames = {"Randy", "James", "Banana", "Zeus", "Athena", "Romulus", "Remus", "Mars", "Apollo", 
+			"Julius", "Kirito", "Asuna", "Main", "Nessie", "Luther", "Kakarot", "Link", "Zelda", "Fox", "Mario", "Bowser", 
+			"Lucario", "Pikachu", "Squirtle", "Anakin", "Obi-Wan", "Yoda", "Baby Yoda", "Jar-Jar", "Aquaman", "Baymax", "Bigfoot", 
+			"Yeti", "Bond", "Han Solo", "Rocky", "Spock", "Picard", "Joker", "Batman", "Kermit", "Zorro", "Aragorn", "Gandalf", 
+			"Bilbo", "Frodo", "Isildur", "Pippin", "Gollum", "Saruman", "Sauron", "Shelob"};
 	static JFrame frame;
 	static ChatPanel panel;
 	public static JLabel connectedLabel;
