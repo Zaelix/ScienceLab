@@ -11,6 +11,7 @@ import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
+import javax.swing.JTextField;
 
 public class SyntaxChecker implements ActionListener {
 
@@ -18,6 +19,7 @@ public class SyntaxChecker implements ActionListener {
 	JPanel mainPanel = new JPanel();
 	JPanel upperPanel = new JPanel();
 	JPanel lowerPanel = new JPanel();
+	JTextField inputField = new JTextField();
 	JButton button = new JButton("Click me!");
 	
 	Dimension panelSize = new Dimension(500, 300);
@@ -29,6 +31,12 @@ public class SyntaxChecker implements ActionListener {
 	public void setup() {
 		button = createButtonWithImage("power_button.png");
 		frame.add(mainPanel);
+		
+		// input text field stuff
+		inputField.setPreferredSize(new Dimension(100, 30));
+		mainPanel.add(inputField);
+		// end input text field stuff
+		
 		mainPanel.add(upperPanel);
 		mainPanel.add(button);
 		mainPanel.add(lowerPanel);
@@ -56,5 +64,7 @@ public class SyntaxChecker implements ActionListener {
 	@Override
 	public void actionPerformed(ActionEvent e) {
 		System.out.println("Hi");
+		String input = inputField.getText();
+		System.out.println(input);
 	}
 }
