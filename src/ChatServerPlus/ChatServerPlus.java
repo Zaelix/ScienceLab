@@ -49,6 +49,9 @@ public class ChatServerPlus implements ActionListener, KeyListener, MouseWheelLi
 	static int totalLines = 0;
 	static int startMessage = 0;
 	static ArrayList<String> messages = new ArrayList<String>();
+	
+	static ArrayList<String> names = new ArrayList<String>();
+	static ArrayList<Color> colors = new ArrayList<Color>();
 
 	static ServerSocket serverSocket;
 	int connectionTimer;
@@ -60,6 +63,29 @@ public class ChatServerPlus implements ActionListener, KeyListener, MouseWheelLi
 		app.start();
 	}
 
+	public void initializeColors() {
+		colors.add(Color.GREEN);
+		colors.add(Color.BLUE);
+		colors.add(Color.RED);
+		colors.add(Color.YELLOW);
+		colors.add(Color.CYAN);
+		colors.add(Color.PINK);
+		colors.add(Color.MAGENTA);
+	}
+	
+	public static int getNameIndex(String name) {
+		for(int i = 0; i < names.size(); i++) {
+			if(names.get(i).contentEquals(name)) {
+				System.out.println(name + " at index " + i);
+				return i;
+			}
+		}
+		names.add(name);
+		System.out.println("Added " + name);
+		System.out.println(name + " at index " + names.size());
+		return names.size()-1;
+	}
+	
 	public void makeFrame() {
 		timer = new Timer(1000 / 30, this);
 		try {
@@ -92,6 +118,8 @@ public class ChatServerPlus implements ActionListener, KeyListener, MouseWheelLi
 		textInput.addKeyListener(this);
 		frame.addMouseWheelListener(this);
 		frame.pack();
+		names.add(name);
+		initializeColors();
 		timer.start();
 	}
 
@@ -129,11 +157,11 @@ public class ChatServerPlus implements ActionListener, KeyListener, MouseWheelLi
 			label.init();
 			totalLines += label.pixelHeight + 5;
 			label.setLocation(5, 750 - totalLines);
-			if (s.contains(name)) {
-				label.setBackground(new Color(50, 200, 200));
-			} else {
-				label.setBackground(new Color(150, 100, 250));
-			}
+			
+			String senderName = s.split(":")[0];
+			
+			label.setBackground(colors.get(getNameIndex(senderName)));
+			
 			panel.add(label);
 		}
 		panel = trimMessageList(panel);
