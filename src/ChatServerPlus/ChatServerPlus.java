@@ -42,14 +42,14 @@ public class ChatServerPlus implements ActionListener, KeyListener, MouseWheelLi
 	static ArrayList<Thread> threads = new ArrayList<Thread>();
 
 	static JLabel connectedLabel;
-	//static String font = "verdana";
+	// static String font = "verdana";
 	static int font = 0;
-	static String[] fonts = {"Verdana", "Garamond", "Cambria", "Courier", "Times"};
+	static String[] fonts = { "Verdana", "Garamond", "Cambria", "Courier", "Times" };
 	static int fontSize = 2;
 	static int totalLines = 0;
 	static int startMessage = 0;
 	static ArrayList<String> messages = new ArrayList<String>();
-	
+
 	static ArrayList<String> names = new ArrayList<String>();
 	static ArrayList<Color> colors = new ArrayList<Color>();
 
@@ -66,26 +66,23 @@ public class ChatServerPlus implements ActionListener, KeyListener, MouseWheelLi
 	public void initializeColors() {
 		colors.add(Color.GREEN);
 		colors.add(Color.BLUE);
-		colors.add(Color.RED);
+		// colors.add(Color.RED);
 		colors.add(Color.YELLOW);
 		colors.add(Color.CYAN);
 		colors.add(Color.PINK);
 		colors.add(Color.MAGENTA);
 	}
-	
+
 	public static int getNameIndex(String name) {
-		for(int i = 0; i < names.size(); i++) {
-			if(names.get(i).contentEquals(name)) {
-				System.out.println(name + " at index " + i);
+		for (int i = 0; i < names.size(); i++) {
+			if (names.get(i).contentEquals(name)) {
 				return i;
 			}
 		}
 		names.add(name);
-		System.out.println("Added " + name);
-		System.out.println(name + " at index " + names.size());
-		return names.size()-1;
+		return names.size() - 1;
 	}
-	
+
 	public void makeFrame() {
 		timer = new Timer(1000 / 30, this);
 		try {
@@ -118,8 +115,6 @@ public class ChatServerPlus implements ActionListener, KeyListener, MouseWheelLi
 		textInput.addKeyListener(this);
 		frame.addMouseWheelListener(this);
 		frame.pack();
-		names.add(name);
-		initializeColors();
 		timer.start();
 	}
 
@@ -157,11 +152,11 @@ public class ChatServerPlus implements ActionListener, KeyListener, MouseWheelLi
 			label.init();
 			totalLines += label.pixelHeight + 5;
 			label.setLocation(5, 750 - totalLines);
-			
+
 			String senderName = s.split(":")[0];
-			
+
 			label.setBackground(colors.get(getNameIndex(senderName)));
-			
+
 			panel.add(label);
 		}
 		panel = trimMessageList(panel);
@@ -176,7 +171,7 @@ public class ChatServerPlus implements ActionListener, KeyListener, MouseWheelLi
 		label.setPreferredSize(new Dimension(490, 100));
 		return label;
 	}
-	
+
 	public static JPanel trimMessageList(JPanel panel) {
 		while (totalLines > 9000) {
 			ChatMessage message = (ChatMessage) panel.getComponent(0);
@@ -207,6 +202,8 @@ public class ChatServerPlus implements ActionListener, KeyListener, MouseWheelLi
 		// String ip = JOptionPane.showInputDialog("Enter the IP Address");
 		// int port = Integer.parseInt(JOptionPane.showInputDialog("Enter the port
 		// number"));
+		names.add(name);
+		initializeColors();
 		System.out.println(getIP());
 		startServer();
 	}
@@ -320,7 +317,7 @@ public class ChatServerPlus implements ActionListener, KeyListener, MouseWheelLi
 		}
 		if (e.getKeyCode() == 34) {
 			font++;
-			if(font >= fonts.length) {
+			if (font >= fonts.length) {
 				font = 0;
 			}
 			System.out.println(fonts[font]);

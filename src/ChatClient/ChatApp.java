@@ -47,10 +47,33 @@ public class ChatApp implements ActionListener, KeyListener, MouseWheelListener 
 	static int startMessage = 0;
 	static ArrayList<String> messages = new ArrayList<String>();
 
+	static ArrayList<String> names = new ArrayList<String>();
+	static ArrayList<Color> colors = new ArrayList<Color>();
+
 	public static void main(String[] args) {
 		ChatApp app = new ChatApp();
 		app.makeFrame();
 		app.start();
+	}
+
+	public void initializeColors() {
+		colors.add(Color.GREEN);
+		colors.add(Color.BLUE);
+		// colors.add(Color.RED);
+		colors.add(Color.YELLOW);
+		colors.add(Color.CYAN);
+		colors.add(Color.PINK);
+		colors.add(Color.MAGENTA);
+	}
+
+	public static int getNameIndex(String name) {
+		for (int i = 0; i < names.size(); i++) {
+			if (names.get(i).contentEquals(name)) {
+				return i;
+			}
+		}
+		names.add(name);
+		return names.size() - 1;
 	}
 
 	public void makeFrame() {
@@ -118,11 +141,11 @@ public class ChatApp implements ActionListener, KeyListener, MouseWheelListener 
 			label.init();
 			totalLines += label.pixelHeight + 5;
 			label.setLocation(5, 750 - totalLines);
-			if (s.contains(name)) {
-				label.setBackground(new Color(50, 200, 200));
-			} else {
-				label.setBackground(new Color(150, 100, 250));
-			}
+
+			String senderName = s.split(":")[0];
+
+			label.setBackground(colors.get(getNameIndex(senderName)));
+
 			panel.add(label);
 		}
 		panel = trimMessageList(panel);
@@ -169,6 +192,8 @@ public class ChatApp implements ActionListener, KeyListener, MouseWheelListener 
 		// int port = Integer.parseInt(JOptionPane.showInputDialog("Enter the port
 		// number"));
 		name = randomNames[new Random().nextInt(randomNames.length)];
+		names.add(name);
+		initializeColors();
 		client = new ClientGreeter();
 		client.start();
 
