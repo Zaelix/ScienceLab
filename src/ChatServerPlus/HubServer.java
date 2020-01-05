@@ -22,6 +22,7 @@ public class HubServer {
 	DataInputStream in;
 
 	private int serverNum;
+	public static int nextValidServerNum = 0;
 	
 	public HubServer(int port, int serverNum, ServerSocket sock) {
 		this.port = port;
@@ -33,7 +34,11 @@ public class HubServer {
 
 	public void start() {
 		try {
+			status = 1;
+			serverSocket.setReuseAddress(true);
+			System.out.println("Waiting for Socket.accept()...");
 			connection = serverSocket.accept();
+			System.out.println("Socket accepted!");
 			status = 2;
 
 			out = new DataOutputStream(connection.getOutputStream());
@@ -53,11 +58,6 @@ public class HubServer {
 			}
 		} catch (Exception e) {
 			System.out.println("Connection lost.");
-			try {
-				serverSocket.close();
-			} catch (IOException e1) {
-				e1.printStackTrace();
-			}
 			retryLostConnection();
 		}
 	}

@@ -13,6 +13,7 @@ import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
+import java.util.HashMap;
 
 import javax.swing.JButton;
 import javax.swing.JFrame;
@@ -38,8 +39,8 @@ public class ChatServerPlus implements ActionListener, KeyListener, MouseWheelLi
 	static JButton sender;
 
 	static int clientCount = 0;
-	static ArrayList<HubServer> servers = new ArrayList<HubServer>();
-	static ArrayList<Thread> threads = new ArrayList<Thread>();
+	static HashMap<Integer,HubServer> servers = new HashMap<Integer,HubServer>();
+	static HashMap<Integer,Thread> threads = new HashMap<Integer,Thread>();
 
 	static JLabel connectedLabel;
 	// static String font = "verdana";
@@ -210,31 +211,40 @@ public class ChatServerPlus implements ActionListener, KeyListener, MouseWheelLi
 
 	public void startServer() {
 		connectionTimer = 0;
-		servers.add(new HubServer(80 + servers.size(), servers.size(), serverSocket));
+		int serverNum = HubServer.nextValidServerNum;
+		HubServer.nextValidServerNum++;
+		servers.put(serverNum,new HubServer(80 + serverNum, serverNum, serverSocket));
 		System.out.println("Servers: " + servers.size());
-		// servers.get(servers.size() - 1).start();
+
 		Thread thread1 = new Thread(() -> {
-			servers.get(servers.size() - 1).start();
+			servers.get(serverNum).start();
 		});
-		// threads.add(thread1);
+		threads.put(serverNum, thread1);
 		thread1.start();
 	}
 
 	public static void restartServer(int port, int serverNum) {
 		System.out.println("Restarting server...");
-		servers.set(serverNum, new HubServer(port, serverNum, serverSocket));
+		servers.put(serverNum, new HubServer(port, serverNum, serverSocket));
 		connectedLabel.setText(clientCount + " Clients Connected.");
-		System.out.println("Server recreated, attempting connections...");
+		System.out.println("Server "+ serverNum +" recreated, attempting connections...");
+		try {
+			threads.get(serverNum).join(1000);
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 		Thread thread1 = new Thread(() -> {
 			servers.get(serverNum).start();
 		});
+		threads.put(serverNum, thread1);
 		thread1.start();
 	}
 
 	ArrayList<Integer> getOpenPorts() {
 		ArrayList<Integer> ports = new ArrayList<Integer>();
 		int clients = 0;
-		for (HubServer s : servers) {
+		for (HubServer s : servers.values()) {
 			if (s.status == 1) {
 				ports.add(s.getServerPort());
 			}
@@ -262,7 +272,7 @@ public class ChatServerPlus implements ActionListener, KeyListener, MouseWheelLi
 	}
 
 	public static void sendToClients(String message, int source) {
-		for (HubServer s : servers) {
+		for (HubServer s : servers.values()) {
 			if (s.getServerNumber() != source) {
 				s.send(message);
 			}

@@ -16,8 +16,8 @@ public class ClientGreeter {
 
 	public void start() {
 
-		String ip = "192.168.7.217";
-		//String ip = "localhost";
+		//String ip = "192.168.7.217";
+		String ip = "localhost";
 		int port = 80;
 		try {
 			sock = new Socket(ip, port);
