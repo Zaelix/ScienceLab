@@ -18,7 +18,6 @@ import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.Timer;
 
-import ChatServerPlus.Server;
 
 /*
  * Using the Click_Chat example, write an application that allows a server computer to chat with a client computer.

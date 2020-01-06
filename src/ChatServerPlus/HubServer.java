@@ -6,88 +6,104 @@ import java.io.EOFException;
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
-import java.util.ArrayList;
-
-import javax.swing.JLabel;
+import java.util.HashMap;
 
 public class HubServer {
 	private int port;
-	int status = 0;
 	public ServerSocket serverSocket;
 	Socket connection;
+	HashMap<Integer, Socket> connections = new HashMap<Integer, Socket>();
+	HashMap<Integer, Thread> threads = new HashMap<Integer, Thread>();
+	HashMap<Integer, DataOutputStream> outs = new HashMap<Integer, DataOutputStream>();
+	HashMap<Integer, DataInputStream> ins = new HashMap<Integer, DataInputStream>();
 
 	String recievedMessage;
 
-	DataOutputStream out;
-	DataInputStream in;
-
-	private int serverNum;
 	public static int nextValidServerNum = 0;
-	
-	public HubServer(int port, int serverNum, ServerSocket sock) {
+
+	public HubServer(int port, ServerSocket sock) {
 		this.port = port;
-		this.serverNum = serverNum;
 		this.serverSocket = sock;
-		status = 1;
 		recievedMessage = "";
 	}
 
 	public void start() {
+		while (true) {
+			try {
+				serverSocket.setReuseAddress(true);
+				System.out.println("Waiting for Socket.accept()...");
+				connections.put(nextValidServerNum, serverSocket.accept());
+				int serverNum = nextValidServerNum;
+				nextValidServerNum++;
+				Thread t = new Thread(() -> {
+					startConnection(serverNum);
+				});
+				threads.put(serverNum, t);
+				t.start();
+			} catch (Exception e) {
+				System.out.println("Connection lost.");
+			}
+		}
+	}
+
+	public void startConnection(int serverNum) {
 		try {
-			status = 1;
-			serverSocket.setReuseAddress(true);
-			System.out.println("Waiting for Socket.accept()...");
-			connection = serverSocket.accept();
 			System.out.println("Socket accepted!");
-			status = 2;
 
-			out = new DataOutputStream(connection.getOutputStream());
-			in = new DataInputStream(connection.getInputStream());
+			outs.put(serverNum, new DataOutputStream(connections.get(serverNum).getOutputStream()));
+			ins.put(serverNum, new DataInputStream(connections.get(serverNum).getInputStream()));
 
-			out.flush();
+			outs.get(serverNum).flush();
 
-			while (connection.isConnected()) {
+			while (connections.get(serverNum).isConnected()) {
 				try {
-					recievedMessage = in.readUTF();
-					
+					recievedMessage = ins.get(serverNum).readUTF();
+
 					ChatServerPlus.addMessage(recievedMessage, serverNum);
 				} catch (EOFException e) {
-					retryLostConnection();
+					disconnect(serverNum);
 					break;
 				}
 			}
 		} catch (Exception e) {
 			System.out.println("Connection lost.");
-			retryLostConnection();
+			disconnect(serverNum);
 		}
 	}
 
-	public void retryLostConnection() {
+	public void disconnect(int serverNum) {
 		try {
-			serverSocket.close();
-			Thread.sleep(1000);
-		} catch (InterruptedException | IOException e1) {
-			// TODO Auto-generated catch block
-			e1.printStackTrace();
-		}
-		ChatServerPlus.restartServer(port, serverNum);
-	}
-
-	public void send(String s) {
-		try {
-			if (out != null) {
-				out.writeUTF(s);
-				out.flush();
-			}
+			connections.get(serverNum).close();
 		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		connections.remove(serverNum);
+		outs.remove(serverNum);
+		ins.remove(serverNum);
+		Thread t = threads.get(serverNum);
+		threads.remove(serverNum);
+		try {
+			t.join();
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 	}
-	
-	public int getServerNumber() {
-		return serverNum;
+
+	public void send(String s, int source) {
+		for (int key : outs.keySet()) {
+			try {
+				if (outs.get(key) != null && key != source) {
+					outs.get(key).writeUTF(s);
+					outs.get(key).flush();
+				}
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		}
 	}
-	
+
 	public int getServerPort() {
 		return port;
 	}

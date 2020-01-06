@@ -39,8 +39,7 @@ public class ChatServerPlus implements ActionListener, KeyListener, MouseWheelLi
 	static JButton sender;
 
 	static int clientCount = 0;
-	static HashMap<Integer,HubServer> servers = new HashMap<Integer,HubServer>();
-	static HashMap<Integer,Thread> threads = new HashMap<Integer,Thread>();
+	static HubServer server;
 
 	static JLabel connectedLabel;
 	// static String font = "verdana";
@@ -213,48 +212,13 @@ public class ChatServerPlus implements ActionListener, KeyListener, MouseWheelLi
 		connectionTimer = 0;
 		int serverNum = HubServer.nextValidServerNum;
 		HubServer.nextValidServerNum++;
-		servers.put(serverNum,new HubServer(80 + serverNum, serverNum, serverSocket));
-		System.out.println("Servers: " + servers.size());
-
-		Thread thread1 = new Thread(() -> {
-			servers.get(serverNum).start();
-		});
-		threads.put(serverNum, thread1);
-		thread1.start();
+		server = new HubServer(80, serverSocket);
+		server.start();
 	}
 
-	public static void restartServer(int port, int serverNum) {
-		System.out.println("Restarting server...");
-		servers.put(serverNum, new HubServer(port, serverNum, serverSocket));
+	public void setClientCountLabel() {
+		clientCount = server.connections.values().size();
 		connectedLabel.setText(clientCount + " Clients Connected.");
-		System.out.println("Server "+ serverNum +" recreated, attempting connections...");
-		try {
-			threads.get(serverNum).join(1000);
-		} catch (InterruptedException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		Thread thread1 = new Thread(() -> {
-			servers.get(serverNum).start();
-		});
-		threads.put(serverNum, thread1);
-		thread1.start();
-	}
-
-	ArrayList<Integer> getOpenPorts() {
-		ArrayList<Integer> ports = new ArrayList<Integer>();
-		int clients = 0;
-		for (HubServer s : servers.values()) {
-			if (s.status == 1) {
-				ports.add(s.getServerPort());
-			}
-			if (s.status == 2) {
-				clients++;
-			}
-		}
-		clientCount = clients;
-		connectedLabel.setText(clientCount + " Clients Connected.");
-		return ports;
 	}
 
 	public static void addMessage(String s, int serverNum) {
@@ -272,11 +236,7 @@ public class ChatServerPlus implements ActionListener, KeyListener, MouseWheelLi
 	}
 
 	public static void sendToClients(String message, int source) {
-		for (HubServer s : servers.values()) {
-			if (s.getServerNumber() != source) {
-				s.send(message);
-			}
-		}
+		server.send(message, source);
 	}
 
 	public static void addClient() {
@@ -309,10 +269,8 @@ public class ChatServerPlus implements ActionListener, KeyListener, MouseWheelLi
 
 		connectionTimer++;
 
-		ArrayList<Integer> ports = getOpenPorts();
-		if (connectionTimer > connectionCooldown && ports.size() == 0) {
-			startServer();
-		}
+		setClientCountLabel();
+
 		panel.repaint();
 	}
 
