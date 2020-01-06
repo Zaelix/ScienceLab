@@ -210,8 +210,6 @@ public class ChatServerPlus implements ActionListener, KeyListener, MouseWheelLi
 
 	public void startServer() {
 		connectionTimer = 0;
-		int serverNum = HubServer.nextValidServerNum;
-		HubServer.nextValidServerNum++;
 		server = new HubServer(80, serverSocket);
 		server.start();
 	}
@@ -237,14 +235,6 @@ public class ChatServerPlus implements ActionListener, KeyListener, MouseWheelLi
 
 	public static void sendToClients(String message, int source) {
 		server.send(message, source);
-	}
-
-	public static void addClient() {
-		clientCount++;
-	}
-
-	public static void removeClient() {
-		clientCount--;
 	}
 
 	public static String getIP() {
