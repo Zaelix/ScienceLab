@@ -143,7 +143,7 @@ public class ChatApp implements ActionListener, KeyListener, MouseWheelListener 
 
 			String senderName = s.split(":")[0];
 
-			label.setBackground(colors.get(getNameIndex(senderName)));
+			label.setBackground(colors.get(getNameIndex(senderName)%colors.size()));
 
 			panel.add(label);
 		}

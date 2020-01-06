@@ -155,7 +155,7 @@ public class ChatServerPlus implements ActionListener, KeyListener, MouseWheelLi
 
 			String senderName = s.split(":")[0];
 
-			label.setBackground(colors.get(getNameIndex(senderName)));
+			label.setBackground(colors.get(getNameIndex(senderName)%colors.size()));
 
 			panel.add(label);
 		}
@@ -252,7 +252,6 @@ public class ChatServerPlus implements ActionListener, KeyListener, MouseWheelLi
 
 	@Override
 	public void actionPerformed(ActionEvent e) {
-		// TODO Auto-generated method stub
 		if (e.getSource().equals(sender)) {
 			sendMessage();
 		}
