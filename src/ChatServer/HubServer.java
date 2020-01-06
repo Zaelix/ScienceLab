@@ -1,4 +1,4 @@
-package ChatServerPlus;
+package ChatServer;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
@@ -59,7 +59,7 @@ public class HubServer {
 				try {
 					recievedMessage = ins.get(serverNum).readUTF();
 
-					ChatServerPlus.addMessage(recievedMessage, serverNum);
+					ChatServer.addMessage(recievedMessage, serverNum);
 				} catch (EOFException e) {
 					disconnect(serverNum);
 					break;

@@ -4,7 +4,7 @@ import java.net.*;
 
 import javax.swing.JLabel;
 
-import ChatServerPlus.ChatServerPlus;
+import ChatServer.ChatServer;
 
 import java.io.*;
 

@@ -1,4 +1,4 @@
-package ChatServerPlus;
+package ChatClient;
 
 import java.awt.Color;
 import java.awt.Dimension;
@@ -8,12 +8,8 @@ import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.awt.event.MouseWheelEvent;
 import java.awt.event.MouseWheelListener;
-import java.io.IOException;
-import java.net.InetAddress;
-import java.net.ServerSocket;
-import java.net.UnknownHostException;
 import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.Random;
 
 import javax.swing.JButton;
 import javax.swing.JFrame;
@@ -22,27 +18,26 @@ import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.Timer;
 
-import ChatClient.ChatMessage;
-import ChatClient.ChatPanel;
-
 /*
  * Using the Click_Chat example, write an application that allows a server computer to chat with a client computer.
  */
 
-public class ChatServerPlus implements ActionListener, KeyListener, MouseWheelListener {
+public class ChatAppClient implements ActionListener, KeyListener, MouseWheelListener {
 	Timer timer;
-	static String name = "Server";
+	static String name = "client";
+	static String[] randomNames = { "Randy", "James", "Banana", "Zeus", "Athena", "Romulus", "Remus", "Mars", "Apollo",
+			"Julius", "Kirito", "Asuna", "Main", "Nessie", "Luther", "Kakarot", "Link", "Zelda", "Fox", "Mario",
+			"Bowser", "Lucario", "Pikachu", "Squirtle", "Anakin", "Obi-Wan", "Yoda", "Baby Yoda", "Jar-Jar", "Aquaman",
+			"Baymax", "Bigfoot", "Yeti", "Bond", "Han Solo", "Rocky", "Spock", "Picard", "Joker", "Batman", "Kermit",
+			"Zorro", "Aragorn", "Gandalf", "Bilbo", "Frodo", "Isildur", "Pippin", "Gollum", "Saruman", "Sauron",
+			"Shelob" };
 	static JFrame frame;
 	static ChatPanel panel;
+	public static JLabel connectedLabel;
 	static JLabel textView;
 	static JTextField textInput;
 	static JButton sender;
-
-	static int clientCount = 0;
-	static HubServer server;
-
-	static JLabel connectedLabel;
-	// static String font = "verdana";
+	static ClientGreeter client;
 	static int font = 0;
 	static String[] fonts = { "Verdana", "Garamond", "Cambria", "Courier", "Times" };
 	static int fontSize = 2;
@@ -53,12 +48,8 @@ public class ChatServerPlus implements ActionListener, KeyListener, MouseWheelLi
 	static ArrayList<String> names = new ArrayList<String>();
 	static ArrayList<Color> colors = new ArrayList<Color>();
 
-	static ServerSocket serverSocket;
-	int connectionTimer;
-	int connectionCooldown = 60;
-
 	public static void main(String[] args) {
-		ChatServerPlus app = new ChatServerPlus();
+		ChatAppClient app = new ChatAppClient();
 		app.makeFrame();
 		app.start();
 	}
@@ -85,21 +76,17 @@ public class ChatServerPlus implements ActionListener, KeyListener, MouseWheelLi
 
 	public void makeFrame() {
 		timer = new Timer(1000 / 30, this);
-		try {
-			serverSocket = new ServerSocket(80);
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
 		frame = new JFrame();
 		panel = new ChatPanel();
 		JPanel textPanel = new JPanel();
 		textPanel.setPreferredSize(new Dimension(500, 750));
 		textPanel.setBackground(Color.BLACK);
+
 		connectedLabel = new JLabel("Waiting for Connection");
 		connectedLabel.setBackground(Color.white);
 		connectedLabel.setOpaque(true);
 		panel.add(connectedLabel);
+
 		panel.add(textPanel);
 		textInput = new JTextField();
 		textInput.setPreferredSize(new Dimension(300, 40));
@@ -204,72 +191,49 @@ public class ChatServerPlus implements ActionListener, KeyListener, MouseWheelLi
 		// String ip = JOptionPane.showInputDialog("Enter the IP Address");
 		// int port = Integer.parseInt(JOptionPane.showInputDialog("Enter the port
 		// number"));
+		name = randomNames[new Random().nextInt(randomNames.length)];
 		names.add(name);
 		initializeColors();
-		System.out.println(getIP());
-		startServer();
+		client = new ClientGreeter();
+		client.start();
+
+		while (client.sock.isConnected()) {
+
+		}
+
 	}
 
-	public void startServer() {
-		connectionTimer = 0;
-		server = new HubServer(80, serverSocket);
-		server.start();
+	public static void restartClient() {
+		System.out.println("Restarting Client...");
+		client = new ClientGreeter();
+		connectedLabel.setText("Attempting to Connect...");
+		System.out.println("Client recreated, attempting connections...");
+		client.start();
 	}
 
-	public void setClientCountLabel() {
-		clientCount = server.connections.values().size();
-		connectedLabel.setText(clientCount + " Clients Connected.");
-	}
-
-	public static void addMessage(String s, int serverNum) {
+	public static void addMessage(String s) {
 		messages.add(s);
-
-		sendToClients(s, serverNum);
 		System.out.println(s);
 		startMessage++;
 		rebuildFrame();
 	}
 
-	private void sendMessage() {
-		addMessage(name + ": " + textInput.getText(), -1);
-		textInput.setText("");
-	}
-
-	public static void sendToClients(String message, int source) {
-		server.send(message, source);
-	}
-
-	public static String getIP() {
-		InetAddress inetAddress;
-		try {
-			inetAddress = InetAddress.getLocalHost();
-			System.out.println("Host Name:- " + inetAddress.getHostName());
-			return "IP Address:- " + inetAddress.getHostAddress();
-		} catch (UnknownHostException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		return "IP Not Found";
-	}
-
 	@Override
 	public void actionPerformed(ActionEvent e) {
 		if (e.getSource().equals(sender)) {
-			sendMessage();
+			client.send(name + ": " + textInput.getText());
+			addMessage(name + ": " + textInput.getText());
+			textInput.setText("");
 		}
-
-		connectionTimer++;
-
-		setClientCountLabel();
-
 		panel.repaint();
 	}
 
 	@Override
 	public void keyPressed(KeyEvent e) {
-		System.out.println(e.getKeyCode());
 		if (e.getKeyCode() == 10) {
-			sendMessage();
+			client.send(name + ": " + textInput.getText());
+			addMessage(name + ": " + textInput.getText());
+			textInput.setText("");
 		}
 		if (e.getKeyCode() == 33) {
 			ChatPanel.changeTheme();
