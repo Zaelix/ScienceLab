@@ -23,101 +23,18 @@ import javax.swing.Timer;
  */
 
 public class ChatApp implements ActionListener, KeyListener, MouseWheelListener {
-	Timer timer;
-	static String name = "client";
+
 	static String[] randomNames = { "Randy", "James", "Banana", "Zeus", "Athena", "Romulus", "Remus", "Mars", "Apollo",
 			"Julius", "Kirito", "Asuna", "Main", "Nessie", "Luther", "Kakarot", "Link", "Zelda", "Fox", "Mario",
 			"Bowser", "Lucario", "Pikachu", "Squirtle", "Anakin", "Obi-Wan", "Yoda", "Baby Yoda", "Jar-Jar", "Aquaman",
 			"Baymax", "Bigfoot", "Yeti", "Bond", "Han Solo", "Rocky", "Spock", "Picard", "Joker", "Batman", "Kermit",
 			"Zorro", "Aragorn", "Gandalf", "Bilbo", "Frodo", "Isildur", "Pippin", "Gollum", "Saruman", "Sauron",
 			"Shelob" };
-	static JFrame frame;
-	static ChatPanel panel;
-	public static JLabel connectedLabel;
-	static JLabel textView;
-	static JTextField textInput;
-	static JButton sender;
+
+
 	static ClientGreeter client;
-	static int font = 0;
-	static String[] fonts = { "Verdana", "Garamond", "Cambria", "Courier", "Times" };
-	static int fontSize = 2;
-	static int totalLines = 0;
-	static int startMessage = 0;
-	static ArrayList<String> messages = new ArrayList<String>();
 
-	static ArrayList<String> names = new ArrayList<String>();
-	static ArrayList<Color> colors = new ArrayList<Color>();
-
-	public static void main(String[] args) {
-		ChatApp app = new ChatApp();
-		app.makeFrame();
-		app.start();
-	}
-
-	public void initializeColors() {
-		colors.add(Color.GREEN);
-		colors.add(Color.BLUE);
-		// colors.add(Color.RED);
-		colors.add(Color.YELLOW);
-		colors.add(Color.CYAN);
-		colors.add(Color.PINK);
-		colors.add(Color.MAGENTA);
-	}
-
-	public static int getNameIndex(String name) {
-		for (int i = 0; i < names.size(); i++) {
-			if (names.get(i).contentEquals(name)) {
-				return i;
-			}
-		}
-		names.add(name);
-		return names.size() - 1;
-	}
-
-	public void makeFrame() {
-		timer = new Timer(1000 / 30, this);
-		frame = new JFrame();
-		panel = new ChatPanel();
-		JPanel textPanel = new JPanel();
-		textPanel.setPreferredSize(new Dimension(500, 750));
-		textPanel.setBackground(Color.BLACK);
-
-		connectedLabel = new JLabel("Waiting for Connection");
-		connectedLabel.setBackground(Color.white);
-		connectedLabel.setOpaque(true);
-		panel.add(connectedLabel);
-
-		panel.add(textPanel);
-		textInput = new JTextField();
-		textInput.setPreferredSize(new Dimension(300, 40));
-		sender = new JButton("Send");
-		sender.addActionListener(this);
-		panel.add(textInput);
-		panel.add(sender);
-		panel.add(createDirectionsLabel());
-		frame.add(panel);
-		frame.setPreferredSize(new Dimension(520, 1000));
-		frame.setVisible(true);
-		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		textInput.addKeyListener(this);
-		frame.addMouseWheelListener(this);
-		frame.pack();
-		timer.start();
-	}
-
-	static public void rebuildFrame() {
-		frame.remove(panel);
-		panel = new ChatPanel();
-		panel.add(connectedLabel);
-		panel.add(createMessagesPanel());
-		panel.add(textInput);
-		panel.add(sender);
-		panel.add(createDirectionsLabel());
-		frame.add(panel);
-		textInput.requestFocus();
-		frame.pack();
-	}
-
+	// CLEARED ABOVE THIS LINE 
 	public static JPanel createMessagesPanel() {
 		JPanel panel = new JPanel(null);
 		String[] msgs = new String[messages.size()];
