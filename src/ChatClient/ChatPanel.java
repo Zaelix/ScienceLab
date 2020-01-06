@@ -39,7 +39,7 @@ public class ChatPanel extends JPanel {
 		int green = 0;
 		int blue = 0;
 		shifter++;
-		if (shifter % 20 == 0) {
+		if (shifter % 3 == 0) {
 			for (int x = 0; x < getWidth(); x += 5) {
 				for (int y = 0; y < getHeight(); y += 5) {
 					red = gen.nextInt(255);
@@ -56,13 +56,16 @@ public class ChatPanel extends JPanel {
 		int red = 0;
 		int green = 0;
 		int blue = 0;
-		for (int x = 0; x < getWidth(); x += 5) {
-			red = gen.nextInt(255);
-			green = gen.nextInt(255);
-			blue = gen.nextInt(255);
-			for (int y = 0; y < getHeight(); y += 5) {
-				g.setColor(new Color(red, green, blue));
-				g.fillRect(x, y, 5, 5);
+		shifter++;
+		if (shifter % 3 == 0) {
+			for (int x = 0; x < getWidth(); x += 5) {
+				red = gen.nextInt(255);
+				green = gen.nextInt(255);
+				blue = gen.nextInt(255);
+				for (int y = 0; y < getHeight(); y += 5) {
+					g.setColor(new Color(red, green, blue));
+					g.fillRect(x, y, 5, 5);
+				}
 			}
 		}
 	}
