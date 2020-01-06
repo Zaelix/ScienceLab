@@ -22,14 +22,14 @@ public class ChatPanel extends JPanel {
 			drawPattern(g);
 		}
 	}
-	
+
 	public static void setTheme(int newTheme) {
 		theme = newTheme;
 	}
-	
+
 	public static void changeTheme() {
 		theme++;
-		if(theme > 2) {
+		if (theme > 2) {
 			theme = 0;
 		}
 	}
@@ -38,13 +38,16 @@ public class ChatPanel extends JPanel {
 		int red = 0;
 		int green = 0;
 		int blue = 0;
-		for (int x = 0; x < getWidth(); x += 5) {
-			for (int y = 0; y < getHeight(); y += 5) {
-				red = gen.nextInt(255);
-				green = gen.nextInt(255);
-				blue = gen.nextInt(255);
-				g.setColor(new Color(red, green, blue));
-				g.fillRect(x, y, 5, 5);
+		shifter++;
+		if (shifter % 20 == 0) {
+			for (int x = 0; x < getWidth(); x += 5) {
+				for (int y = 0; y < getHeight(); y += 5) {
+					red = gen.nextInt(255);
+					green = gen.nextInt(255);
+					blue = gen.nextInt(255);
+					g.setColor(new Color(red, green, blue));
+					g.fillRect(x, y, 5, 5);
+				}
 			}
 		}
 	}

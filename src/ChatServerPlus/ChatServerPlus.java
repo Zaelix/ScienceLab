@@ -143,21 +143,23 @@ public class ChatServerPlus implements ActionListener, KeyListener, MouseWheelLi
 			startMessage = 0;
 		}
 		for (int i = startMessage; i >= 0; i--) {
-			String s = msgs[i];
-			Object[] objs = splitIntoLines(s, 70);
-			s = (String) objs[0];
-			ChatMessage label = new ChatMessage("<html><pre><font face=\"" + fonts[font] + "\" size=\"" + fontSize
-					+ "\" color=\"rgb(255,0,0)\">" + s + "</font></pre></html>");
-			label.setLines((int) objs[1]);
-			label.init();
-			totalLines += label.pixelHeight + 5;
-			label.setLocation(5, 750 - totalLines);
+			if (i < msgs.length) {
+				String s = msgs[i];
+				Object[] objs = splitIntoLines(s, 70);
+				s = (String) objs[0];
+				ChatMessage label = new ChatMessage("<html><pre><font face=\"" + fonts[font] + "\" size=\"" + fontSize
+						+ "\" color=\"rgb(255,0,0)\">" + s + "</font></pre></html>");
+				label.setLines((int) objs[1]);
+				label.init();
+				totalLines += label.pixelHeight + 5;
+				label.setLocation(5, 750 - totalLines);
 
-			String senderName = s.split(":")[0];
+				String senderName = s.split(":")[0];
 
-			label.setBackground(colors.get(getNameIndex(senderName)%colors.size()));
+				label.setBackground(colors.get(getNameIndex(senderName) % colors.size()));
 
-			panel.add(label);
+				panel.add(label);
+			}
 		}
 		panel = trimMessageList(panel);
 		panel.setPreferredSize(new Dimension(500, 750));
