@@ -262,13 +262,13 @@ public class ChatApp implements ActionListener, KeyListener, MouseWheelListener 
 			names.add(name);
 			initializeColors();
 			client = new ClientGreeter(this);
+			timer.start();
 			client.start();
 
 			while (client.sock.isConnected()) {
 
 			}
 		}
-		timer.start();
 	}
 
 	public void restartClient() {
@@ -330,6 +330,7 @@ public class ChatApp implements ActionListener, KeyListener, MouseWheelListener 
 	public void startServer() {
 		connectionTimer = 0;
 		server = new HubServer(80, serverSocket, this);
+		timer.start();
 		server.start();
 	}
 
