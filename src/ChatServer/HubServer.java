@@ -8,11 +8,13 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.HashMap;
 
+import ChatClient.ChatApp;
+
 public class HubServer {
 	private int port;
 	public ServerSocket serverSocket;
 	Socket connection;
-	HashMap<Integer, Socket> connections = new HashMap<Integer, Socket>();
+	private HashMap<Integer, Socket> connections = new HashMap<Integer, Socket>();
 	HashMap<Integer, Thread> threads = new HashMap<Integer, Thread>();
 	HashMap<Integer, DataOutputStream> outs = new HashMap<Integer, DataOutputStream>();
 	HashMap<Integer, DataInputStream> ins = new HashMap<Integer, DataInputStream>();
@@ -20,10 +22,12 @@ public class HubServer {
 	String recievedMessage;
 
 	public static int nextValidServerNum = 0;
+	ChatApp app;
 
-	public HubServer(int port, ServerSocket sock) {
+	public HubServer(int port, ServerSocket sock, ChatApp app) {
 		this.port = port;
 		this.serverSocket = sock;
+		this.app = app;
 		recievedMessage = "";
 	}
 
@@ -32,7 +36,7 @@ public class HubServer {
 			try {
 				serverSocket.setReuseAddress(true);
 				System.out.println("Waiting for Socket.accept()...");
-				connections.put(nextValidServerNum, serverSocket.accept());
+				getConnections().put(nextValidServerNum, serverSocket.accept());
 				int serverNum = nextValidServerNum;
 				nextValidServerNum++;
 				Thread t = new Thread(() -> {
@@ -50,16 +54,16 @@ public class HubServer {
 		try {
 			System.out.println("Socket accepted!");
 
-			outs.put(serverNum, new DataOutputStream(connections.get(serverNum).getOutputStream()));
-			ins.put(serverNum, new DataInputStream(connections.get(serverNum).getInputStream()));
+			outs.put(serverNum, new DataOutputStream(getConnections().get(serverNum).getOutputStream()));
+			ins.put(serverNum, new DataInputStream(getConnections().get(serverNum).getInputStream()));
 
 			outs.get(serverNum).flush();
 
-			while (connections.get(serverNum).isConnected()) {
+			while (getConnections().get(serverNum).isConnected()) {
 				try {
 					recievedMessage = ins.get(serverNum).readUTF();
 
-					ChatServer.addMessage(recievedMessage, serverNum);
+					app.addMessage(recievedMessage, serverNum);
 				} catch (EOFException e) {
 					disconnect(serverNum);
 					break;
@@ -73,12 +77,12 @@ public class HubServer {
 
 	public void disconnect(int serverNum) {
 		try {
-			connections.get(serverNum).close();
+			getConnections().get(serverNum).close();
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		connections.remove(serverNum);
+		getConnections().remove(serverNum);
 		outs.remove(serverNum);
 		ins.remove(serverNum);
 		Thread t = threads.get(serverNum);
@@ -106,5 +110,13 @@ public class HubServer {
 
 	public int getServerPort() {
 		return port;
+	}
+
+	public HashMap<Integer, Socket> getConnections() {
+		return connections;
+	}
+
+	public void setConnections(HashMap<Integer, Socket> connections) {
+		this.connections = connections;
 	}
 }

@@ -13,7 +13,11 @@ public class ClientGreeter {
 	DataInputStream input;
 	String Input;
 	public Socket sock;
-
+	ChatApp app;
+	
+	ClientGreeter(ChatApp app){
+		this.app = app;
+	}
 	public void start() {
 
 		//String ip = "192.168.7.217";
@@ -26,14 +30,14 @@ public class ClientGreeter {
 			output = new DataOutputStream(sock.getOutputStream());
 
 			input = new DataInputStream(sock.getInputStream());
-			ChatApp.connectedLabel.setText("Connected!");
+			app.connectedLabel.setText("Connected!");
 			
 			while (sock.isConnected()) {
 
 				String in = input.readUTF();
 				if (!in.equals("")) {
 					Input = in;
-					ChatApp.addMessage(in);
+					app.addMessage(in,-1);
 				}
 			}
 			sock.close();
@@ -44,13 +48,13 @@ public class ClientGreeter {
 	}
 	
 	public void retryLostConnection() {
-		ChatApp.connectedLabel.setText("Server not found.");
+		app.connectedLabel.setText("Server not found.");
 		
 		for(int i = 5; i >= 0; i--) {
 			try {
 				//sock.close();
 				Thread.sleep(1000);
-				ChatApp.connectedLabel.setText("Attempting to reconnect in " + i + " seconds...");
+				app.connectedLabel.setText("Attempting to reconnect in " + i + " seconds...");
 				
 			} catch (InterruptedException e1) {
 				// TODO Auto-generated catch block
@@ -58,7 +62,7 @@ public class ClientGreeter {
 			}
 		}
 		
-		ChatApp.restartClient();
+		app.restartClient();
 	}
 	
 	public void send(String text) {

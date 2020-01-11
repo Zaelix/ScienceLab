@@ -8,15 +8,22 @@ import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.awt.event.MouseWheelEvent;
 import java.awt.event.MouseWheelListener;
+import java.io.IOException;
+import java.net.InetAddress;
+import java.net.ServerSocket;
+import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.Random;
 
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.Timer;
+
+import ChatServer.HubServer;
 
 /*
  * Using the Click_Chat example, write an application that allows a server computer to chat with a client computer.
@@ -24,6 +31,7 @@ import javax.swing.Timer;
 
 public class ChatApp implements ActionListener, KeyListener, MouseWheelListener {
 
+	// CLIENT ONLY VARIABLES
 	static String[] randomNames = { "Randy", "James", "Banana", "Zeus", "Athena", "Romulus", "Remus", "Mars", "Apollo",
 			"Julius", "Kirito", "Asuna", "Main", "Nessie", "Luther", "Kakarot", "Link", "Zelda", "Fox", "Mario",
 			"Bowser", "Lucario", "Pikachu", "Squirtle", "Anakin", "Obi-Wan", "Yoda", "Baby Yoda", "Jar-Jar", "Aquaman",
@@ -31,11 +39,122 @@ public class ChatApp implements ActionListener, KeyListener, MouseWheelListener 
 			"Zorro", "Aragorn", "Gandalf", "Bilbo", "Frodo", "Isildur", "Pippin", "Gollum", "Saruman", "Sauron",
 			"Shelob" };
 
+	ClientGreeter client;
 
-	static ClientGreeter client;
+	// SHARED CODE FOR CLIENT AND SERVER
+	Timer timer;
+	String name = "Server";
+	JFrame frame;
+	ChatPanel panel;
+	JLabel textView;
+	JTextField textInput;
+	JButton sender;
 
-	// CLEARED ABOVE THIS LINE 
-	public static JPanel createMessagesPanel() {
+	int clientCount = 0;
+	HubServer server;
+
+	JLabel connectedLabel;
+	// static String font = "verdana";
+	int font = 0;
+	static String[] fonts = { "Verdana", "Garamond", "Cambria", "Courier", "Times" };
+	int fontSize = 2;
+	int totalLines = 0;
+	int startMessage = 0;
+	ArrayList<String> messages = new ArrayList<String>();
+
+	ArrayList<String> names = new ArrayList<String>();
+	ArrayList<Color> colors = new ArrayList<Color>();
+
+	ServerSocket serverSocket;
+	int connectionTimer;
+	int connectionCooldown = 60;
+
+	boolean isServer = false;
+
+	public static void main(String[] args) {
+		ChatApp app = new ChatApp();
+		app.makeFrame();
+		app.start();
+	}
+
+	public void initializeColors() {
+		colors.add(Color.GREEN);
+		colors.add(Color.BLUE);
+		// colors.add(Color.RED);
+		colors.add(Color.YELLOW);
+		colors.add(Color.CYAN);
+		colors.add(Color.PINK);
+		colors.add(Color.MAGENTA);
+	}
+
+	public int getNameIndex(String name) {
+		for (int i = 0; i < names.size(); i++) {
+			if (names.get(i).contentEquals(name)) {
+				return i;
+			}
+		}
+		names.add(name);
+		return names.size() - 1;
+	}
+
+	public boolean askClientOrServer() {
+		int ans = JOptionPane.showOptionDialog(null, "Would you like to start a client, or server?", "Initialization",
+				0, JOptionPane.INFORMATION_MESSAGE, null, new String[] { "Client", "Server" }, null);
+		return ans % 2 == 1;
+	}
+
+	public void makeFrame() {
+		timer = new Timer(1000 / 30, this);
+		isServer = askClientOrServer();
+		System.out.println(isServer);
+		if (isServer) {
+			try {
+				serverSocket = new ServerSocket(80);
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
+		frame = new JFrame();
+		panel = new ChatPanel(0,0);
+		JPanel textPanel = new JPanel();
+		textPanel.setPreferredSize(new Dimension(500, 750));
+		textPanel.setBackground(Color.BLACK);
+		connectedLabel = new JLabel("Waiting for Connection");
+		connectedLabel.setBackground(Color.white);
+		connectedLabel.setOpaque(true);
+		panel.add(connectedLabel);
+		panel.add(textPanel);
+		textInput = new JTextField();
+		textInput.setPreferredSize(new Dimension(300, 40));
+		sender = new JButton("Send");
+		sender.addActionListener(this);
+		panel.add(textInput);
+		panel.add(sender);
+		panel.add(createDirectionsLabel());
+		frame.add(panel);
+		frame.setPreferredSize(new Dimension(520, 1000));
+		frame.setVisible(true);
+		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		textInput.addKeyListener(this);
+		frame.addMouseWheelListener(this);
+		frame.pack();
+	}
+
+	public void rebuildFrame() {
+		frame.remove(panel);
+		panel = new ChatPanel(panel.shifter, panel.theme);
+		panel.add(connectedLabel);
+		panel.add(createMessagesPanel());
+		panel.add(textInput);
+		panel.add(sender);
+		panel.add(createDirectionsLabel());
+		frame.add(panel);
+		textInput.requestFocus();
+		frame.pack();
+	}
+
+	public JPanel createMessagesPanel() {
 		JPanel panel = new JPanel(null);
 		String[] msgs = new String[messages.size()];
 		messages.toArray(msgs);
@@ -71,14 +190,14 @@ public class ChatApp implements ActionListener, KeyListener, MouseWheelListener 
 		return panel;
 	}
 
-	static JLabel createDirectionsLabel() {
+	JLabel createDirectionsLabel() {
 		JLabel label = new JLabel();
 		label.setText("<html>Page Up: Change theme <br/>Page Down: Change font</html>");
 		label.setPreferredSize(new Dimension(490, 100));
 		return label;
 	}
 
-	public static JPanel trimMessageList(JPanel panel) {
+	public JPanel trimMessageList(JPanel panel) {
 		while (totalLines > 9000) {
 			ChatMessage message = (ChatMessage) panel.getComponent(0);
 			totalLines -= message.pixelHeight + 5;
@@ -87,7 +206,7 @@ public class ChatApp implements ActionListener, KeyListener, MouseWheelListener 
 		return panel;
 	}
 
-	public static Object[] splitIntoLines(String s, int size) {
+	public Object[] splitIntoLines(String s, int size) {
 		ArrayList<String> strings = new ArrayList<String>();
 		int lineCount = 0;
 		int index = 0;
@@ -103,57 +222,99 @@ public class ChatApp implements ActionListener, KeyListener, MouseWheelListener 
 		return new Object[] { fin, lineCount };
 	}
 
-	public void start() {
-		// name = JOptionPane.showInputDialog("Pick a username!");
-		// String ip = JOptionPane.showInputDialog("Enter the IP Address");
-		// int port = Integer.parseInt(JOptionPane.showInputDialog("Enter the port
-		// number"));
-		name = randomNames[new Random().nextInt(randomNames.length)];
-		names.add(name);
-		initializeColors();
-		client = new ClientGreeter();
-		client.start();
+	@Override
+	public void mouseWheelMoved(MouseWheelEvent e) {
+		// System.out.println("Mouse Scrolled! Start Message is now: " + startMessage);
+		startMessage += e.getWheelRotation();
+		rebuildFrame();
+	}
 
-		while (client.sock.isConnected()) {
-
-		}
+	@Override
+	public void keyReleased(KeyEvent e) {
+		// TODO Auto-generated method stub
 
 	}
 
-	public static void restartClient() {
+	@Override
+	public void keyTyped(KeyEvent e) {
+		// TODO Auto-generated method stub
+
+	}
+
+	private void sendMessage() {
+		String s = name + ": " + textInput.getText();
+		addMessage(s, -1);
+		textInput.setText("");
+		if (!isServer) {
+			client.send(s);
+		}
+	}
+
+	// SHARED, BUT DIFFERENT FOR CLIENT AND SERVER
+	public void start() {
+		if (isServer) {
+			names.add(name);
+			initializeColors();
+			System.out.println(getIP());
+			startServer();
+		} else {
+			name = randomNames[new Random().nextInt(randomNames.length)];
+			names.add(name);
+			initializeColors();
+			client = new ClientGreeter(this);
+			client.start();
+
+			while (client.sock.isConnected()) {
+
+			}
+		}
+		timer.start();
+	}
+
+	public void restartClient() {
 		System.out.println("Restarting Client...");
-		client = new ClientGreeter();
+		client = new ClientGreeter(this);
 		connectedLabel.setText("Attempting to Connect...");
 		System.out.println("Client recreated, attempting connections...");
 		client.start();
 	}
 
-	public static void addMessage(String s) {
+	public void addMessage(String s, int serverNum) {
 		messages.add(s);
-		System.out.println(s);
+
+		if (isServer) {
+			sendToClients(s, serverNum);
+		} 
+		System.out.println(serverNum + ": " + s);
 		startMessage++;
 		rebuildFrame();
+	}
+
+	public void setClientCountLabel() {
+		clientCount = server.getConnections().values().size();
+		connectedLabel.setText(clientCount + " Clients Connected.");
 	}
 
 	@Override
 	public void actionPerformed(ActionEvent e) {
 		if (e.getSource().equals(sender)) {
-			client.send(name + ": " + textInput.getText());
-			addMessage(name + ": " + textInput.getText());
-			textInput.setText("");
+			sendMessage();
+		}
+		if (isServer) {
+			connectionTimer++;
+			setClientCountLabel();
 		}
 		panel.repaint();
 	}
 
 	@Override
 	public void keyPressed(KeyEvent e) {
+		// System.out.println(e.getKeyCode());
 		if (e.getKeyCode() == 10) {
-			client.send(name + ": " + textInput.getText());
-			addMessage(name + ": " + textInput.getText());
-			textInput.setText("");
+			sendMessage();
 		}
 		if (e.getKeyCode() == 33) {
-			ChatPanel.changeTheme();
+			panel.changeTheme();
 		}
 		if (e.getKeyCode() == 34) {
 			font++;
@@ -165,22 +326,28 @@ public class ChatApp implements ActionListener, KeyListener, MouseWheelListener 
 		}
 	}
 
-	@Override
-	public void keyReleased(KeyEvent arg0) {
-		// TODO Auto-generated method stub
-
+	// SERVER ONLY
+	public void startServer() {
+		connectionTimer = 0;
+		server = new HubServer(80, serverSocket, this);
+		server.start();
 	}
 
-	@Override
-	public void keyTyped(KeyEvent arg0) {
-		// TODO Auto-generated method stub
-
+	public void sendToClients(String message, int source) {
+		server.send(message, source);
 	}
 
-	@Override
-	public void mouseWheelMoved(MouseWheelEvent e) {
-		System.out.println("Mouse Scrolled! Start Message is now: " + startMessage);
-		startMessage += e.getWheelRotation();
-		rebuildFrame();
+	public String getIP() {
+		InetAddress inetAddress;
+		try {
+			inetAddress = InetAddress.getLocalHost();
+			System.out.println("Host Name:- " + inetAddress.getHostName());
+			return "IP Address:- " + inetAddress.getHostAddress();
+		} catch (UnknownHostException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return "IP Not Found";
 	}
+
 }

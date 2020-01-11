@@ -200,10 +200,6 @@ public class ChatServer implements ActionListener, KeyListener, MouseWheelListen
 	}
 
 	public void start() {
-		// name = JOptionPane.showInputDialog("Pick a username!");
-		// String ip = JOptionPane.showInputDialog("Enter the IP Address");
-		// int port = Integer.parseInt(JOptionPane.showInputDialog("Enter the port
-		// number"));
 		names.add(name);
 		initializeColors();
 		System.out.println(getIP());
@@ -217,7 +213,7 @@ public class ChatServer implements ActionListener, KeyListener, MouseWheelListen
 	}
 
 	public void setClientCountLabel() {
-		clientCount = server.connections.values().size();
+		clientCount = server.getConnections().values().size();
 		connectedLabel.setText(clientCount + " Clients Connected.");
 	}
 

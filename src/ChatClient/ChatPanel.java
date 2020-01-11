@@ -8,8 +8,13 @@ import javax.swing.JPanel;
 
 public class ChatPanel extends JPanel {
 	Random gen = new Random();
-	public static int theme = 2;
-	static int shifter = 0;
+	public int theme = 2;
+	int shifter = 0;
+
+	ChatPanel(int shifter, int theme) {
+		this.shifter = shifter;
+		this.theme = theme;
+	}
 
 	public void paintComponent(Graphics g) {
 		if (theme == 0) {
@@ -23,11 +28,11 @@ public class ChatPanel extends JPanel {
 		}
 	}
 
-	public static void setTheme(int newTheme) {
+	public void setTheme(int newTheme) {
 		theme = newTheme;
 	}
 
-	public static void changeTheme() {
+	public void changeTheme() {
 		theme++;
 		if (theme > 2) {
 			theme = 0;
