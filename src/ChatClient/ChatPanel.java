@@ -18,12 +18,15 @@ public class ChatPanel extends JPanel {
 
 	public void paintComponent(Graphics g) {
 		if (theme == 0) {
-			drawStatic(g);
+			drawPlain(g);
 		}
 		if (theme == 1) {
-			drawRainbow(g);
+			drawStatic(g);
 		}
 		if (theme == 2) {
+			drawRainbow(g);
+		}
+		if (theme == 3) {
 			drawPattern(g);
 		}
 	}
@@ -34,11 +37,17 @@ public class ChatPanel extends JPanel {
 
 	public void changeTheme() {
 		theme++;
-		if (theme > 2) {
+		if (theme > 3) {
 			theme = 0;
 		}
 	}
 
+	public void drawPlain(Graphics g) {
+		Color c = g.getColor();
+		c = new Color(c.getRed()+(gen.nextInt(3)-1),c.getRed()+(gen.nextInt(3)-1),c.getRed()+(gen.nextInt(3)-1));
+		g.setColor(c);
+		g.fillRect(0, 0, getWidth(), getHeight());
+	}
 	public void drawStatic(Graphics g) {
 		int red = 0;
 		int green = 0;
