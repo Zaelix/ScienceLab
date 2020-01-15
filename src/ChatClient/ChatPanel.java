@@ -7,38 +7,35 @@ import java.util.Random;
 import javax.swing.JPanel;
 
 public class ChatPanel extends JPanel {
-	Random gen = new Random();
-	public int theme = 2;
-	int shifter = 0;
+	private Random gen = new Random();
+	private int theme = 2;
+	private int shifter = 0;
 
 	ChatPanel(int shifter, int theme) {
-		this.shifter = shifter;
-		this.theme = theme;
+		this.setShifter(shifter);
+		this.setTheme(theme);
 	}
 
 	public void paintComponent(Graphics g) {
-		if (theme == 0) {
+		if (getTheme() == 0) {
 			drawPlain(g);
 		}
-		if (theme == 1) {
+		if (getTheme() == 1) {
 			drawStatic(g);
 		}
-		if (theme == 2) {
+		if (getTheme() == 2) {
 			drawRainbow(g);
 		}
-		if (theme == 3) {
+		if (getTheme() == 3) {
 			drawPattern(g);
 		}
 	}
 
-	public void setTheme(int newTheme) {
-		theme = newTheme;
-	}
 
 	public void changeTheme() {
-		theme++;
-		if (theme > 3) {
-			theme = 0;
+		setTheme(getTheme() + 1);
+		if (getTheme() > 3) {
+			setTheme(0);
 		}
 	}
 
@@ -52,8 +49,8 @@ public class ChatPanel extends JPanel {
 		int red = 0;
 		int green = 0;
 		int blue = 0;
-		shifter++;
-		if (shifter % 3 == 0) {
+		setShifter(getShifter() + 1);
+		if (getShifter() % 3 == 0) {
 			for (int x = 0; x < getWidth(); x += 5) {
 				for (int y = 0; y < getHeight(); y += 5) {
 					red = gen.nextInt(255);
@@ -70,8 +67,8 @@ public class ChatPanel extends JPanel {
 		int red = 0;
 		int green = 0;
 		int blue = 0;
-		shifter++;
-		if (shifter % 3 == 0) {
+		setShifter(getShifter() + 1);
+		if (getShifter() % 3 == 0) {
 			for (int x = 0; x < getWidth(); x += 5) {
 				red = gen.nextInt(255);
 				green = gen.nextInt(255);
@@ -88,11 +85,11 @@ public class ChatPanel extends JPanel {
 		int red = 0;
 		int green = 0;
 		int blue = 0;
-		shifter++;
+		setShifter(getShifter() + 1);
 		for (int x = 0; x < getWidth(); x += 5) {
-			red = (x + shifter) % 255;
+			red = (x + getShifter()) % 255;
 			for (int y = 0; y < getHeight(); y += 5) {
-				green = (y + shifter) % 255;
+				green = (y + getShifter()) % 255;
 				blue = (x + y) % 255;
 				g.setColor(new Color(red, green, blue));
 				g.fillRect(x, y, 5, 5);
@@ -100,4 +97,19 @@ public class ChatPanel extends JPanel {
 		}
 	}
 
+	public int getShifter() {
+		return shifter;
+	}
+
+	public void setShifter(int shifter) {
+		this.shifter = shifter;
+	}
+
+	public int getTheme() {
+		return theme;
+	}
+
+	public void setTheme(int theme) {
+		this.theme = theme;
+	}
 }

@@ -54,7 +54,6 @@ public class ChatApp implements ActionListener, KeyListener, MouseWheelListener 
 	HubServer server;
 
 	JLabel connectedLabel;
-	// static String font = "verdana";
 	int font = 0;
 	static String[] fonts = { "Verdana", "Garamond", "Cambria", "Courier", "Times" };
 	int fontSize = 2;
@@ -71,6 +70,8 @@ public class ChatApp implements ActionListener, KeyListener, MouseWheelListener 
 
 	boolean isServer = false;
 
+	private int maximumLines = 900;
+
 	public static void main(String[] args) {
 		ChatApp app = new ChatApp();
 		app.makeFrame();
@@ -80,13 +81,17 @@ public class ChatApp implements ActionListener, KeyListener, MouseWheelListener 
 	public void initializeColors() {
 		colors.add(Color.GREEN);
 		colors.add(Color.BLUE);
-		// colors.add(Color.RED);
 		colors.add(Color.YELLOW);
 		colors.add(Color.CYAN);
 		colors.add(Color.PINK);
 		colors.add(Color.MAGENTA);
 	}
 
+	/**
+	 * Gets the index of a given name in our names array and returns it. If the name doesn't exist in the array, it adds it and then returns its index.
+	 * @param name
+	 * @return
+	 */
 	public int getNameIndex(String name) {
 		for (int i = 0; i < names.size(); i++) {
 			if (names.get(i).contentEquals(name)) {
@@ -97,12 +102,19 @@ public class ChatApp implements ActionListener, KeyListener, MouseWheelListener 
 		return names.size() - 1;
 	}
 
+	/**
+	 * Asks the user whether they want to run as a client, or as a server. Returns true if they want to be a server.
+	 * @return
+	 */
 	public boolean askClientOrServer() {
 		int ans = JOptionPane.showOptionDialog(null, "Would you like to start a client, or server?", "Initialization",
 				0, JOptionPane.INFORMATION_MESSAGE, null, new String[] { "Client", "Server" }, null);
 		return ans % 2 == 1;
 	}
 
+	/**
+	 * Does the initial setup of creating the frame and all necessary dependencies. Only meant to be called once.
+	 */
 	public void makeFrame() {
 		timer = new Timer(1000 / 30, this);
 		isServer = askClientOrServer();
@@ -111,7 +123,6 @@ public class ChatApp implements ActionListener, KeyListener, MouseWheelListener 
 			try {
 				serverSocket = new ServerSocket(80);
 			} catch (IOException e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 		}
@@ -141,9 +152,12 @@ public class ChatApp implements ActionListener, KeyListener, MouseWheelListener 
 		frame.pack();
 	}
 
+	/**
+	 * Rebuilds the frame. Usable any time the frame contents need to change and be redrawn.
+	 */
 	public void rebuildFrame() {
 		frame.remove(panel);
-		panel = new ChatPanel(panel.shifter, panel.theme);
+		panel = new ChatPanel(panel.getShifter(), panel.getTheme());
 		panel.add(connectedLabel);
 		panel.add(createMessagesPanel());
 		panel.add(textInput);
@@ -154,6 +168,10 @@ public class ChatApp implements ActionListener, KeyListener, MouseWheelListener 
 		frame.pack();
 	}
 
+	/**
+	 * Creates the panel that contains all the message labels in it. Also creates the message labels from the array of message strings.
+	 * @return
+	 */
 	public JPanel createMessagesPanel() {
 		JPanel panel = new JPanel(null);
 		String[] msgs = new String[messages.size()];
@@ -167,17 +185,17 @@ public class ChatApp implements ActionListener, KeyListener, MouseWheelListener 
 		}
 		for (int i = startMessage; i >= 0; i--) {
 			if (i < msgs.length) {
-				String s = msgs[i];
-				Object[] objs = splitIntoLines(s, 70);
-				s = (String) objs[0];
+				String message = msgs[i];
+				Object[] objs = splitIntoLines(message, 70);
+				message = (String) objs[0];
 				ChatMessage label = new ChatMessage("<html><pre><font face=\"" + fonts[font] + "\" size=\"" + fontSize
-						+ "\" color=\"rgb(255,0,0)\">" + s + "</font></pre></html>");
+						+ "\" color=\"rgb(255,0,0)\">" + message + "</font></pre></html>");
 				label.setLines((int) objs[1]);
 				label.init();
 				totalLines += label.pixelHeight + 5;
 				label.setLocation(5, 750 - totalLines);
 
-				String senderName = s.split(":")[0];
+				String senderName = message.split(":")[0];
 
 				label.setBackground(colors.get(getNameIndex(senderName) % colors.size()));
 
@@ -190,6 +208,10 @@ public class ChatApp implements ActionListener, KeyListener, MouseWheelListener 
 		return panel;
 	}
 
+	/**
+	 * Draws the label at the bottom of the frame which says which hotkeys are used and what they do
+	 * @return
+	 */
 	JLabel createDirectionsLabel() {
 		JLabel label = new JLabel();
 		label.setText("<html>Page Up: Change theme <br/>Page Down: Change font</html>");
@@ -197,8 +219,13 @@ public class ChatApp implements ActionListener, KeyListener, MouseWheelListener 
 		return label;
 	}
 
+	/**
+	 * Trims messages off the message list if there are more than the maximum message count.
+	 * @param panel
+	 * @return
+	 */
 	public JPanel trimMessageList(JPanel panel) {
-		while (totalLines > 9000) {
+		while (totalLines > maximumLines ) {
 			ChatMessage message = (ChatMessage) panel.getComponent(0);
 			totalLines -= message.pixelHeight + 5;
 			messages.remove(0);
@@ -206,12 +233,18 @@ public class ChatApp implements ActionListener, KeyListener, MouseWheelListener 
 		return panel;
 	}
 
-	public Object[] splitIntoLines(String s, int size) {
+	/**
+	 * Splits a message string into lines by adding an HTML line break tag into it at specific intervals
+	 * @param message
+	 * @param size
+	 * @return
+	 */
+	public Object[] splitIntoLines(String message, int size) {
 		ArrayList<String> strings = new ArrayList<String>();
 		int lineCount = 0;
 		int index = 0;
-		while (index < s.length()) {
-			strings.add(s.substring(index, Math.min(index + size, s.length())));
+		while (index < message.length()) {
+			strings.add(message.substring(index, Math.min(index + size, message.length())));
 			index += size;
 			lineCount++;
 		}
@@ -224,7 +257,6 @@ public class ChatApp implements ActionListener, KeyListener, MouseWheelListener 
 
 	@Override
 	public void mouseWheelMoved(MouseWheelEvent e) {
-		// System.out.println("Mouse Scrolled! Start Message is now: " + startMessage);
 		startMessage += e.getWheelRotation();
 		rebuildFrame();
 	}
@@ -242,11 +274,11 @@ public class ChatApp implements ActionListener, KeyListener, MouseWheelListener 
 	}
 
 	private void sendMessage() {
-		String s = name + ": " + textInput.getText();
-		addMessage(s, -1);
+		String message = name + ": " + textInput.getText();
+		addMessage(message, -1);
 		textInput.setText("");
 		if (!isServer) {
-			client.send(s);
+			client.send(message);
 		}
 	}
 
@@ -265,7 +297,7 @@ public class ChatApp implements ActionListener, KeyListener, MouseWheelListener 
 			timer.start();
 			client.start();
 
-			while (client.sock.isConnected()) {
+			while (client.getSock().isConnected()) {
 
 			}
 		}
@@ -285,7 +317,7 @@ public class ChatApp implements ActionListener, KeyListener, MouseWheelListener 
 		if (isServer) {
 			sendToClients(s, serverNum);
 		} 
-		System.out.println(serverNum + ": " + s);
+		System.out.println(s);
 		startMessage++;
 		rebuildFrame();
 	}

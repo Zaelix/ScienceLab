@@ -1,19 +1,15 @@
 package ChatClient;
 
-import java.net.*;
-
-import javax.swing.JLabel;
-
-import ChatServer.ChatServer;
-
-import java.io.*;
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
+import java.io.IOException;
+import java.net.Socket;
 
 public class ClientGreeter {
-	DataOutputStream output;
-	DataInputStream input;
-	String Input;
-	public Socket sock;
-	ChatApp app;
+	private DataOutputStream output;
+	private DataInputStream input;
+	private Socket sock;
+	private ChatApp app;
 	
 	ClientGreeter(ChatApp app){
 		this.app = app;
@@ -24,23 +20,22 @@ public class ClientGreeter {
 		String ip = "localhost";
 		int port = 80;
 		try {
-			sock = new Socket(ip, port);
-			System.out.println(sock.isBound());
-			System.out.println(sock.isConnected());
-			output = new DataOutputStream(sock.getOutputStream());
+			setSock(new Socket(ip, port));
+			System.out.println(getSock().isBound());
+			System.out.println(getSock().isConnected());
+			output = new DataOutputStream(getSock().getOutputStream());
 
-			input = new DataInputStream(sock.getInputStream());
+			input = new DataInputStream(getSock().getInputStream());
 			app.connectedLabel.setText("Connected!");
 			
-			while (sock.isConnected()) {
+			while (getSock().isConnected()) {
 
 				String in = input.readUTF();
 				if (!in.equals("")) {
-					Input = in;
 					app.addMessage(in,-1);
 				}
 			}
-			sock.close();
+			getSock().close();
 		} catch (IOException e) {
 			//e.printStackTrace();
 			retryLostConnection();
@@ -73,5 +68,11 @@ public class ClientGreeter {
 			e.printStackTrace();
 		}
 
+	}
+	public Socket getSock() {
+		return sock;
+	}
+	public void setSock(Socket sock) {
+		this.sock = sock;
 	}
 }

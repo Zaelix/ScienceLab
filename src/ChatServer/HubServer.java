@@ -12,17 +12,16 @@ import ChatClient.ChatApp;
 
 public class HubServer {
 	private int port;
-	public ServerSocket serverSocket;
-	Socket connection;
+	private ServerSocket serverSocket;
 	private HashMap<Integer, Socket> connections = new HashMap<Integer, Socket>();
-	HashMap<Integer, Thread> threads = new HashMap<Integer, Thread>();
-	HashMap<Integer, DataOutputStream> outs = new HashMap<Integer, DataOutputStream>();
-	HashMap<Integer, DataInputStream> ins = new HashMap<Integer, DataInputStream>();
+	private HashMap<Integer, Thread> threads = new HashMap<Integer, Thread>();
+	private HashMap<Integer, DataOutputStream> outs = new HashMap<Integer, DataOutputStream>();
+	private HashMap<Integer, DataInputStream> ins = new HashMap<Integer, DataInputStream>();
 
-	String recievedMessage;
+	private String recievedMessage;
 
 	public static int nextValidServerNum = 0;
-	ChatApp app;
+	private ChatApp app;
 
 	public HubServer(int port, ServerSocket sock, ChatApp app) {
 		this.port = port;
@@ -79,7 +78,6 @@ public class HubServer {
 		try {
 			getConnections().get(serverNum).close();
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		getConnections().remove(serverNum);
@@ -90,7 +88,6 @@ public class HubServer {
 		try {
 			t.join();
 		} catch (InterruptedException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 	}
