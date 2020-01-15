@@ -32,7 +32,7 @@ import ChatServer.HubServer;
 public class ChatApp implements ActionListener, KeyListener, MouseWheelListener {
 
 	// CLIENT ONLY VARIABLES
-	private static String[] randomNames = { "Randy", "James", "Banana", "Zeus", "Athena", "Romulus", "Remus", "Mars", "Apollo",
+	private static String[] randomNames = { "Jessie", "James", "Banana", "Zeus", "Athena", "Romulus", "Remus", "Mars", "Apollo",
 			"Julius", "Kirito", "Asuna", "Main", "Nessie", "Luther", "Kakarot", "Link", "Zelda", "Fox", "Mario",
 			"Bowser", "Lucario", "Pikachu", "Squirtle", "Anakin", "Obi-Wan", "Yoda", "Baby Yoda", "Jar-Jar", "Aquaman",
 			"Baymax", "Bigfoot", "Yeti", "Bond", "Han Solo", "Rocky", "Spock", "Picard", "Joker", "Batman", "Kermit",
@@ -46,7 +46,6 @@ public class ChatApp implements ActionListener, KeyListener, MouseWheelListener 
 	private String name = "Server";
 	private JFrame frame;
 	private ChatPanel panel;
-	private JLabel textView;
 	private JTextField textInput;
 	private JButton sender;
 
@@ -65,8 +64,6 @@ public class ChatApp implements ActionListener, KeyListener, MouseWheelListener 
 	private ArrayList<Color> colors = new ArrayList<Color>();
 
 	private ServerSocket serverSocket;
-	private int connectionTimer;
-	private int connectionCooldown = 60;
 
 	private boolean isServer = false;
 
@@ -347,7 +344,6 @@ public class ChatApp implements ActionListener, KeyListener, MouseWheelListener 
 			sendMessage();
 		}
 		if (isServer) {
-			connectionTimer++;
 			setClientCountLabel();
 		}
 		panel.repaint();
@@ -373,7 +369,6 @@ public class ChatApp implements ActionListener, KeyListener, MouseWheelListener 
 
 	// SERVER ONLY
 	public void startServer() {
-		connectionTimer = 0;
 		server = new HubServer(80, serverSocket, this);
 		timer.start();
 		server.start();
