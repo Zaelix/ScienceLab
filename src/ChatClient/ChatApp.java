@@ -244,7 +244,7 @@ public class ChatApp implements ActionListener, KeyListener, MouseWheelListener 
 
 	/**
 	 * Splits a message string into lines by adding an HTML line break tag into it
-	 * at specific intervals
+	 * at specific intervals, and returns an array with the finished message and line count in it.
 	 * 
 	 * @param message
 	 * @param size
@@ -259,11 +259,11 @@ public class ChatApp implements ActionListener, KeyListener, MouseWheelListener 
 			index += size;
 			lineCount++;
 		}
-		String fin = "";
+		String finishedMessage = "";
 		for (String str : strings) {
-			fin += str + "<br/>";
+			finishedMessage += str + "<br/>";
 		}
-		return new Object[] { fin, lineCount };
+		return new Object[] { finishedMessage, lineCount };
 	}
 
 	@Override
@@ -308,7 +308,7 @@ public class ChatApp implements ActionListener, KeyListener, MouseWheelListener 
 			timer.start();
 			client.start();
 
-			while (client.getSock().isConnected()) {
+			while (client.getSocket().isConnected()) {
 
 			}
 		}
@@ -322,13 +322,13 @@ public class ChatApp implements ActionListener, KeyListener, MouseWheelListener 
 		client.start();
 	}
 
-	public void addMessage(String s, int serverNum) {
-		messages.add(s);
+	public void addMessage(String message, int serverNum) {
+		messages.add(message);
 
 		if (isServer) {
-			sendToClients(s, serverNum);
+			sendToClients(message, serverNum);
 		}
-		System.out.println(s);
+		System.out.println(message);
 		startMessage++;
 		rebuildFrame();
 	}

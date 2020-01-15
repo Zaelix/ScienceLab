@@ -8,7 +8,7 @@ import java.net.Socket;
 public class ClientGreeter {
 	private DataOutputStream output;
 	private DataInputStream input;
-	private Socket sock;
+	private Socket socket;
 	private ChatApp app;
 
 	ClientGreeter(ChatApp app) {
@@ -19,22 +19,22 @@ public class ClientGreeter {
 		String ip = "localhost";
 		int port = 80;
 		try {
-			setSock(new Socket(ip, port));
-			System.out.println(getSock().isBound());
-			System.out.println(getSock().isConnected());
-			output = new DataOutputStream(getSock().getOutputStream());
+			setSocket(new Socket(ip, port));
+			System.out.println(getSocket().isBound());
+			System.out.println(getSocket().isConnected());
+			output = new DataOutputStream(getSocket().getOutputStream());
 
-			input = new DataInputStream(getSock().getInputStream());
+			input = new DataInputStream(getSocket().getInputStream());
 			app.getConnectedLabel().setText("Connected!");
 
-			while (getSock().isConnected()) {
+			while (getSocket().isConnected()) {
 
 				String in = input.readUTF();
 				if (!in.equals("")) {
 					app.addMessage(in, -1);
 				}
 			}
-			getSock().close();
+			getSocket().close();
 		} catch (IOException e) {
 			retryLostConnection();
 		}
@@ -65,11 +65,11 @@ public class ClientGreeter {
 
 	}
 
-	public Socket getSock() {
-		return sock;
+	public Socket getSocket() {
+		return socket;
 	}
 
-	public void setSock(Socket sock) {
-		this.sock = sock;
+	public void setSocket(Socket sock) {
+		this.socket = sock;
 	}
 }
