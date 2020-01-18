@@ -20,7 +20,7 @@ public class HubServer {
 
 	private String recievedMessage;
 
-	public static int nextValidServerNum = 0;
+	private static int nextValidServerNum = 0;
 	private ChatApp app;
 
 	public HubServer(int port, ServerSocket sock, ChatApp app) {
