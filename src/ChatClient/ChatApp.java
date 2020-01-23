@@ -91,7 +91,7 @@ public class ChatApp implements ActionListener, KeyListener, MouseWheelListener 
 	 * @param name
 	 * @return
 	 */
-	public int getNameIndex(String name) {
+	private int getNameIndex(String name) {
 		for (int i = 0; i < names.size(); i++) {
 			if (names.get(i).contentEquals(name)) {
 				return i;
@@ -107,7 +107,7 @@ public class ChatApp implements ActionListener, KeyListener, MouseWheelListener 
 	 * 
 	 * @return
 	 */
-	public boolean askClientOrServer() {
+	private boolean askClientOrServer() {
 		int ans = JOptionPane.showOptionDialog(null, "Would you like to start a client, or server?", "Initialization",
 				0, JOptionPane.INFORMATION_MESSAGE, null, new String[] { "Client", "Server" }, null);
 		return ans % 2 == 1;
@@ -117,7 +117,7 @@ public class ChatApp implements ActionListener, KeyListener, MouseWheelListener 
 	 * Does the initial setup of creating the frame and all necessary dependencies.
 	 * Only meant to be called once.
 	 */
-	public void makeFrame() {
+	private void makeFrame() {
 		timer = new Timer(1000 / 30, this);
 		isServer = askClientOrServer();
 		System.out.println(isServer);
@@ -158,7 +158,7 @@ public class ChatApp implements ActionListener, KeyListener, MouseWheelListener 
 	 * Rebuilds the frame. Usable any time the frame contents need to change and be
 	 * redrawn.
 	 */
-	public void rebuildFrame() {
+	private void rebuildFrame() {
 		frame.remove(panel);
 		panel = new ChatPanel(panel.getShifter(), panel.getTheme());
 		panel.add(getConnectedLabel());
@@ -177,7 +177,7 @@ public class ChatApp implements ActionListener, KeyListener, MouseWheelListener 
 	 * 
 	 * @return
 	 */
-	public JPanel createMessagesPanel() {
+	private JPanel createMessagesPanel() {
 		JPanel panel = new JPanel(null);
 		String[] msgs = new String[messages.size()];
 		messages.toArray(msgs);
@@ -219,7 +219,7 @@ public class ChatApp implements ActionListener, KeyListener, MouseWheelListener 
 	 * 
 	 * @return
 	 */
-	JLabel createDirectionsLabel() {
+	private JLabel createDirectionsLabel() {
 		JLabel label = new JLabel();
 		label.setText("<html>Page Up: Change theme <br/>Page Down: Change font</html>");
 		label.setPreferredSize(new Dimension(490, 100));
@@ -233,7 +233,7 @@ public class ChatApp implements ActionListener, KeyListener, MouseWheelListener 
 	 * @param panel
 	 * @return
 	 */
-	public JPanel trimMessageList(JPanel panel) {
+	private JPanel trimMessageList(JPanel panel) {
 		while (totalLines > maximumLines) {
 			ChatMessage message = (ChatMessage) panel.getComponent(0);
 			totalLines -= message.pixelHeight + 5;
@@ -250,7 +250,7 @@ public class ChatApp implements ActionListener, KeyListener, MouseWheelListener 
 	 * @param size
 	 * @return
 	 */
-	public Object[] splitIntoLines(String message, int size) {
+	private Object[] splitIntoLines(String message, int size) {
 		ArrayList<String> strings = new ArrayList<String>();
 		int lineCount = 0;
 		int index = 0;
@@ -294,7 +294,7 @@ public class ChatApp implements ActionListener, KeyListener, MouseWheelListener 
 	}
 
 	// SHARED, BUT DIFFERENT FOR CLIENT AND SERVER
-	public void start() {
+	private void start() {
 		if (isServer) {
 			names.add(name);
 			initializeColors();
@@ -333,7 +333,7 @@ public class ChatApp implements ActionListener, KeyListener, MouseWheelListener 
 		rebuildFrame();
 	}
 
-	public void setClientCountLabel() {
+	private void setClientCountLabel() {
 		clientCount = server.getConnections().values().size();
 		getConnectedLabel().setText(clientCount + " Clients Connected.");
 	}
@@ -368,17 +368,17 @@ public class ChatApp implements ActionListener, KeyListener, MouseWheelListener 
 	}
 
 	// SERVER ONLY
-	public void startServer() {
+	private void startServer() {
 		server = new HubServer(80, serverSocket, this);
 		timer.start();
 		server.start();
 	}
 
-	public void sendToClients(String message, int source) {
+	private void sendToClients(String message, int source) {
 		server.send(message, source);
 	}
 
-	public String getIP() {
+	private String getIP() {
 		InetAddress inetAddress;
 		try {
 			inetAddress = InetAddress.getLocalHost();
@@ -394,7 +394,7 @@ public class ChatApp implements ActionListener, KeyListener, MouseWheelListener 
 		return connectedLabel;
 	}
 
-	public void setConnectedLabel(JLabel connectedLabel) {
+	private void setConnectedLabel(JLabel connectedLabel) {
 		this.connectedLabel = connectedLabel;
 	}
 
