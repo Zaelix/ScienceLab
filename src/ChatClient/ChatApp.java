@@ -75,6 +75,10 @@ public class ChatApp implements ActionListener, KeyListener, MouseWheelListener 
 		app.start();
 	}
 
+	/**
+	 * Initializes the arraylist of color objects which determines which colors users 
+	 * will be displayed with when sending chat messages.
+	 */
 	public void initializeColors() {
 		colors.add(Color.GREEN);
 		colors.add(Color.BLUE);
@@ -284,6 +288,10 @@ public class ChatApp implements ActionListener, KeyListener, MouseWheelListener 
 
 	}
 
+	/**
+	 * Takes the input, appends it to your username, and adds that to the list of messages.
+	 * If it is a client that calls this, it sends the message to the server.
+	 */
 	private void sendMessage() {
 		String message = name + ": " + textInput.getText();
 		addMessage(message, -1);
@@ -294,6 +302,7 @@ public class ChatApp implements ActionListener, KeyListener, MouseWheelListener 
 	}
 
 	// SHARED, BUT DIFFERENT FOR CLIENT AND SERVER
+	
 	private void start() {
 		if (isServer) {
 			names.add(name);
@@ -314,6 +323,10 @@ public class ChatApp implements ActionListener, KeyListener, MouseWheelListener 
 		}
 	}
 
+	/**
+	 * Restarts the client connection. Useful if the connection was dropped and reconnecting 
+	 * is desired.
+	 */
 	public void restartClient() {
 		System.out.println("Restarting Client...");
 		client = new ClientGreeter(this);
@@ -322,17 +335,27 @@ public class ChatApp implements ActionListener, KeyListener, MouseWheelListener 
 		client.start();
 	}
 
-	public void addMessage(String message, int serverNum) {
+	/**
+	 * Adds the given message to the arraylist of messages. If a server calls this, it sends 
+	 * the message to all connected clients except for the client it originated from using 
+	 * the sendToClients method.
+	 * @param message
+	 * @param clientNum
+	 */
+	public void addMessage(String message, int clientNum) {
 		messages.add(message);
 
 		if (isServer) {
-			sendToClients(message, serverNum);
+			sendToClients(message, clientNum);
 		}
 		System.out.println(message);
 		startMessage++;
 		rebuildFrame();
 	}
 
+	/**
+	 * Updates the display of how many clients are connected to this server.
+	 */
 	private void setClientCountLabel() {
 		clientCount = server.getConnections().values().size();
 		getConnectedLabel().setText(clientCount + " Clients Connected.");
@@ -374,10 +397,20 @@ public class ChatApp implements ActionListener, KeyListener, MouseWheelListener 
 		server.start();
 	}
 
+	/**
+	 * Sends a given message to all clients connected to this server, except for 
+	 * the client the message originated from.
+	 * @param message
+	 * @param source
+	 */
 	private void sendToClients(String message, int source) {
 		server.send(message, source);
 	}
 
+	/**
+	 * Returns the IP address and host name of this device.
+	 * @return IPv4 address string
+	 */
 	private String getIP() {
 		InetAddress inetAddress;
 		try {
@@ -390,10 +423,18 @@ public class ChatApp implements ActionListener, KeyListener, MouseWheelListener 
 		return "IP Not Found";
 	}
 
+	/**
+	 * Returns the label used to display the number of connected clients.
+	 * @return
+	 */
 	public JLabel getConnectedLabel() {
 		return connectedLabel;
 	}
 
+	/**
+	 * Sets the label used to display the number of connected clients.
+	 * @param connectedLabel
+	 */
 	private void setConnectedLabel(JLabel connectedLabel) {
 		this.connectedLabel = connectedLabel;
 	}

@@ -24,7 +24,6 @@ public class ChatMessage extends JPanel {
 		setSize(490, 5 + 17 * lines);
 		label.setHorizontalAlignment(SwingConstants.LEFT);
 		this.add(label);
-		// setPreferredSize(new Dimension(490, 5+17*lines));
 		pixelHeight = 5 + 17 * lines;
 	}
 

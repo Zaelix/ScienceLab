@@ -40,6 +40,10 @@ public class ClientGreeter {
 		}
 	}
 
+	/**
+	 * Begins the countdown to attempt a reconnect to the server. Initiates a 
+	 * reconnection attempt at the end of the countdown using ChatApp.restartClient().
+	 */
 	public void retryLostConnection() {
 		app.getConnectedLabel().setText("Server not found.");
 
@@ -56,6 +60,10 @@ public class ClientGreeter {
 		app.restartClient();
 	}
 
+	/**
+	 * Sends the text message through the currently active output connection UTF.
+	 * @param text
+	 */
 	public void send(String text) {
 		try {
 			output.writeUTF(text);

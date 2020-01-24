@@ -31,7 +31,9 @@ public class ChatPanel extends JPanel {
 		}
 	}
 
-
+	/**
+	 * Changes the currently active visual theme of the panel. Increments theme by 1.
+	 */
 	public void changeTheme() {
 		setTheme(getTheme() + 1);
 		if (getTheme() > 3) {
@@ -39,12 +41,21 @@ public class ChatPanel extends JPanel {
 		}
 	}
 
+	/**
+	 * Draws the panel using the "Plain" theme.
+	 * @param g
+	 */
 	public void drawPlain(Graphics g) {
 		Color c = g.getColor();
 		c = new Color(c.getRed()+(gen.nextInt(3)-1),c.getRed()+(gen.nextInt(3)-1),c.getRed()+(gen.nextInt(3)-1));
 		g.setColor(c);
 		g.fillRect(0, 0, getWidth(), getHeight());
 	}
+	
+	/**
+	 * Draws the panel using the "Static" theme.
+	 * @param g
+	 */
 	public void drawStatic(Graphics g) {
 		int red = 0;
 		int green = 0;
@@ -63,6 +74,10 @@ public class ChatPanel extends JPanel {
 		}
 	}
 
+	/**
+	 * Draws the panel using the "Rainbow" theme.
+	 * @param g
+	 */
 	public void drawRainbow(Graphics g) {
 		int red = 0;
 		int green = 0;
@@ -81,6 +96,10 @@ public class ChatPanel extends JPanel {
 		}
 	}
 
+	/**
+	 * Draws the panel using the "Pattern" theme.
+	 * @param g
+	 */
 	public void drawPattern(Graphics g) {
 		int red = 0;
 		int green = 0;
