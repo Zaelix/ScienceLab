@@ -49,42 +49,50 @@ public class HubServer {
 		}
 	}
 
-	public void startConnection(int serverNum) {
+	/**
+	 * Starts a connection with a client and provides them a specific client ID number.
+	 * @param clientNum
+	 */
+	private void startConnection(int clientNum) {
 		try {
 			System.out.println("Socket accepted!");
 
-			outs.put(serverNum, new DataOutputStream(getConnections().get(serverNum).getOutputStream()));
-			ins.put(serverNum, new DataInputStream(getConnections().get(serverNum).getInputStream()));
+			outs.put(clientNum, new DataOutputStream(getConnections().get(clientNum).getOutputStream()));
+			ins.put(clientNum, new DataInputStream(getConnections().get(clientNum).getInputStream()));
 
-			outs.get(serverNum).flush();
+			outs.get(clientNum).flush();
 
-			while (getConnections().get(serverNum).isConnected()) {
+			while (getConnections().get(clientNum).isConnected()) {
 				try {
-					recievedMessage = ins.get(serverNum).readUTF();
+					recievedMessage = ins.get(clientNum).readUTF();
 
-					app.addMessage(recievedMessage, serverNum);
+					app.addMessage(recievedMessage, clientNum);
 				} catch (EOFException e) {
-					disconnect(serverNum);
+					disconnect(clientNum);
 					break;
 				}
 			}
 		} catch (Exception e) {
 			System.out.println("Connection lost.");
-			disconnect(serverNum);
+			disconnect(clientNum);
 		}
 	}
 
-	public void disconnect(int serverNum) {
+	/**
+	 * Disconnects from the given client and closes the connection to them.
+	 * @param clientNum
+	 */
+	private void disconnect(int clientNum) {
 		try {
-			getConnections().get(serverNum).close();
+			getConnections().get(clientNum).close();
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-		getConnections().remove(serverNum);
-		outs.remove(serverNum);
-		ins.remove(serverNum);
-		Thread t = threads.get(serverNum);
-		threads.remove(serverNum);
+		getConnections().remove(clientNum);
+		outs.remove(clientNum);
+		ins.remove(clientNum);
+		Thread t = threads.get(clientNum);
+		threads.remove(clientNum);
 		try {
 			t.join();
 		} catch (InterruptedException e) {
@@ -92,11 +100,16 @@ public class HubServer {
 		}
 	}
 
-	public void send(String s, int source) {
+	/**
+	 * Sends the given message string to all connected clients except for the source client.
+	 * @param message
+	 * @param source
+	 */
+	public void send(String message, int source) {
 		for (int key : outs.keySet()) {
 			try {
 				if (outs.get(key) != null && key != source) {
-					outs.get(key).writeUTF(s);
+					outs.get(key).writeUTF(message);
 					outs.get(key).flush();
 				}
 			} catch (IOException e) {
