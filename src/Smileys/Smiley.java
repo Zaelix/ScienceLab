@@ -22,4 +22,8 @@ public class Smiley extends JLabel {
 		Icon icon = new ImageIcon(imageURL);
 		return icon;
 	}
+	
+	public static void setColor(String newColor) {
+		color = newColor;
+	}
 }

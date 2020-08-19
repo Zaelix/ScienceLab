@@ -16,8 +16,8 @@ public class SmileyRunner {
 		frame.add(panel);
 		// 7. Set the Smiley class's color variable to Smiley.RED
 		// Run it again; are your Smileys all red now?
-		Smiley.color = Smiley.RED;
-		Smiley.color = Smiley.RED;
+		//Smiley.setColor(Smiley.BLUE);
+		Smiley.color = Smiley.GREEN;
 		// 4. Make three Smiley objects and add them to your panel
 		Smiley s1 = new Smiley();
 		panel.add(s1);
