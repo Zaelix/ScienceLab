@@ -14,7 +14,7 @@ public class SmileyRunner {
 		JPanel panel = new JPanel();
 		// 3. Add your panel to your frame
 		frame.add(panel);
-		// 7. Set the Smiley class's color variable to Smiley.RED
+		// 7. Set the Smiley class's color variable to Smiley.YELLOW
 		// Run it again; are your Smileys all red now?
 		//Smiley.setColor(Smiley.BLUE);
 		Smiley.color = Smiley.GREEN;

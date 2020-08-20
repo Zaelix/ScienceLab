@@ -1,4 +1,4 @@
-package Smileys;
+package _01_static_smiley_blues;
 
 import java.net.URL;
 
@@ -14,7 +14,7 @@ public class Smiley extends JLabel {
 	public static String color = BLUE;
 	
 	Smiley(){
-		super(loadIcon("Smileys/smiley_"+ color +".jpg"));
+		super(loadIcon("_01_static_smiley_blues/smiley_"+ color +".jpg"));
 	}
 	
 	private static Icon loadIcon(String fileName) {
