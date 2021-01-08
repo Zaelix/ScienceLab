@@ -1,5 +1,7 @@
 package Audio;
 
+import java.util.Random;
+
 import javax.sound.midi.MidiChannel;
 import javax.sound.midi.MidiSystem;
 import javax.sound.midi.MidiUnavailableException;
@@ -7,20 +9,42 @@ import javax.sound.midi.Synthesizer;
 
 public class MidiBand {
 	Synthesizer synth;
-	MidiChannel[] channels;
-	int channel = 0; // 0 is a piano, 9 is percussion, other channels are for other instruments
+	public static MidiChannel[] channels;
+	static int channel = 0; // 0 is a piano, 9 is percussion, other channels are for other instruments. 0 - 15
 
-	int volume = 80; // between 0 et 127
+	int volume = 120; // between 0 and 127
 	int duration = 200; // in milliseconds
 
+	Instrument piano = new Instrument("Piano", 0, 60, 15, 300);
+	Instrument bass = new Instrument("Bass", 1, 30, 15, 1000);
 	public static void main(String[] args) {
 		MidiBand band = new MidiBand();
 		band.initialize();
-		band.playTest();
+		band.repeatPhrase(4);
+		//band.playNonsense();
 	}
 	
-	void initialize() {
+	void playPhrase() {
+		piano.playPhrase();
+		bass.playPhrase();
+	}
+	
 
+	void repeatPhrase(int count) {
+		for (int i = 0; i < count; i++) {
+			playPhrase();
+			System.out.println("Phrase "+i+" Complete!");
+			try {
+				Thread.sleep(4000);
+			} catch (InterruptedException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
+		stopTheBand();
+	}
+
+	void initialize() {
 		try {
 			synth = MidiSystem.getSynthesizer();
 			synth.open();
@@ -30,15 +54,6 @@ public class MidiBand {
 			e.printStackTrace();
 		}
 		channels = synth.getChannels();
-	}
-
-	void playNonsense() {
-		try {
-			
-			synth.close();
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
 	}
 
 	public void playTest() {
@@ -74,6 +89,34 @@ public class MidiBand {
 
 			synth.close();
 		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
+
+	public static void playNote(Note note) {
+		new Thread(new Runnable() {
+			public void run() {
+				channels[channel].noteOn(note.noteNumber, note.volume);
+				try {
+					Thread.sleep(note.duration);
+				} catch (InterruptedException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+				channels[channel].noteOff(note.noteNumber);
+
+			}
+		}).start();
+	}
+	
+	void stopTheBand() {
+		try {
+			Thread.sleep(3000);
+			channels[channel].allNotesOff();
+			Thread.sleep(500);
+			synth.close();
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 	}

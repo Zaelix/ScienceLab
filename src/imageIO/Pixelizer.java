@@ -1,5 +1,6 @@
 package imageIO;
 
+import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -13,6 +14,7 @@ import javax.imageio.ImageIO;
 import javax.swing.ImageIcon;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
+import javax.swing.JPanel;
 import javax.swing.JSlider;
 import javax.swing.Timer;
 import javax.swing.event.ChangeEvent;
@@ -37,33 +39,49 @@ public class Pixelizer implements ChangeListener, ActionListener {
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		frame.setVisible(true);
 		panel = new PixelizerPanel(this);
-		frame.add(panel);
-		timer.start();
 		try {
 			src = ImageIO.read(new File("src/imageIO/face.jpg"));
-			frame.setPreferredSize(new Dimension(src.getWidth(), src.getHeight() + 40));
+			frame.setPreferredSize(new Dimension(src.getWidth(), src.getHeight() + 90));
 			img = pixelize(1);
+			System.out.println("Loaded image file successfully! Width: " + src.getWidth() + ", Height: " + src.getHeight());
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
+		panel.add(createSlider());
+		frame.add(panel);
+		timer.start();
 		frame.pack();
+	}
+	
+	JSlider createSlider() {
+		JSlider slider = new JSlider(JSlider.HORIZONTAL,
+                1, 100, 1);
+		slider.addChangeListener(this);
+		
+		//Turn on labels at major tick marks.
+		slider.setMajorTickSpacing(10);
+		slider.setMinorTickSpacing(1);
+		slider.setPaintTicks(true);
+		slider.setPaintLabels(true);
+		slider.setPreferredSize(new Dimension(src.getWidth()-20, 40));
+		return slider;
 	}
 
 	BufferedImage pixelize(int p) {
 		BufferedImage img = new BufferedImage(src.getWidth(), src.getHeight(), BufferedImage.TYPE_INT_RGB);
 		System.out.println("P:" + p);
-		int rgb = img.getRGB(0, 0);
+		int rgb = 0;
 		for (int x = 0; x < src.getWidth(); x += p) {
 			for (int y = 0; y < src.getHeight(); y += p) {
 				rgb = src.getRGB(x, y);
-				fillNewPixel(x, y, p, rgb, img);
+				img = fillNewPixel(x, y, p, rgb, img);
 			}
 		}
-		colorize(img);
+		//colorize(img);
 		return img;
 	}
 
-	void fillNewPixel(int px, int py, int p, int rgb, BufferedImage img) {
+	BufferedImage fillNewPixel(int px, int py, int p, int rgb, BufferedImage img) {
 		for (int x = px; x < px + p; x++) {
 			for (int y = py; y < py + p; y++) {
 				if (x < img.getWidth() && y < img.getHeight()) {
@@ -71,6 +89,7 @@ public class Pixelizer implements ChangeListener, ActionListener {
 				}
 			}
 		}
+		return img;
 	}
 
 	void colorize(BufferedImage img) {
