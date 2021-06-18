@@ -29,7 +29,6 @@ public class MidiBand {
 		bass.playPhrase();
 	}
 	
-
 	void repeatPhrase(int count) {
 		for (int i = 0; i < count; i++) {
 			playPhrase();
@@ -104,7 +103,6 @@ public class MidiBand {
 					e.printStackTrace();
 				}
 				channels[channel].noteOff(note.noteNumber);
-
 			}
 		}).start();
 	}
