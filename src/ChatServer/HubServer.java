@@ -94,7 +94,7 @@ public class HubServer {
 		Thread t = threads.get(clientNum);
 		threads.remove(clientNum);
 		try {
-			t.join();
+			t.join(10000);
 		} catch (InterruptedException e) {
 			e.printStackTrace();
 		}
@@ -117,7 +117,10 @@ public class HubServer {
 			}
 		}
 	}
-
+	
+	/**
+	 * Gets the port the server is acting on
+	 */
 	public int getServerPort() {
 		return port;
 	}

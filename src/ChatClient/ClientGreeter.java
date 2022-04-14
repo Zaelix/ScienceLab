@@ -17,7 +17,7 @@ public class ClientGreeter {
 
 	public void start() {
 		String ip = "localhost";
-		int port = 80;
+		int port = 8080;
 		try {
 			setSocket(new Socket(ip, port));
 			System.out.println(getSocket().isBound());

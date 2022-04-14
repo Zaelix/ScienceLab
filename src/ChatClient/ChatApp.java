@@ -93,7 +93,8 @@ public class ChatApp implements ActionListener, KeyListener, MouseWheelListener 
 	 * doesn't exist in the array, it adds it and then returns its index.
 	 * 
 	 * @param name
-	 * @return
+	 * @return an integer indicating the index of the passed in name within the 
+	 * names arraylist.
 	 */
 	private int getNameIndex(String name) {
 		for (int i = 0; i < names.size(); i++) {
@@ -109,7 +110,7 @@ public class ChatApp implements ActionListener, KeyListener, MouseWheelListener 
 	 * Asks the user whether they want to run as a client, or as a server. Returns
 	 * true if they want to be a server.
 	 * 
-	 * @return
+	 * @return a boolean representing the user's choice of starting a client or server (client is false, server is true)
 	 */
 	private boolean askClientOrServer() {
 		int ans = JOptionPane.showOptionDialog(null, "Would you like to start a client, or server?", "Initialization",
@@ -127,7 +128,7 @@ public class ChatApp implements ActionListener, KeyListener, MouseWheelListener 
 		System.out.println(isServer);
 		if (isServer) {
 			try {
-				serverSocket = new ServerSocket(80);
+				serverSocket = new ServerSocket(8080);
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
@@ -392,7 +393,7 @@ public class ChatApp implements ActionListener, KeyListener, MouseWheelListener 
 
 	// SERVER ONLY
 	private void startServer() {
-		server = new HubServer(80, serverSocket, this);
+		server = new HubServer(8080, serverSocket, this);
 		timer.start();
 		server.start();
 	}

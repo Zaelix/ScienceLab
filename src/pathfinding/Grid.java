@@ -151,9 +151,9 @@ public class Grid extends JPanel implements ActionListener, KeyListener {
 	ArrayList<Node> findPath(Node start, Node goal) {
 		clearHighlights();
 		PriorityQueue<Node> frontier = new PriorityQueue<Node>();
-		frontier.add(start);
 		HashMap<Node, Node> came_from = new HashMap<Node, Node>();
 		HashMap<Node, Integer> costs_so_far = new HashMap<Node, Integer>();
+		frontier.add(start);
 		came_from.put(start, null);
 		costs_so_far.put(start, 0);
 		Node end = start;
