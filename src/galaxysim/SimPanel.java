@@ -93,10 +93,10 @@ public class SimPanel extends JPanel implements KeyListener, ActionListener, Mou
 	public void paintComponent(Graphics g) {
 		g.setColor(Color.BLACK);
 		g.fillRect(0, 0, GalaxySim.WIDTH, GalaxySim.HEIGHT);
-		camera.drawPlayer(g);
 		for (Sector s : currentSectorGroup) {
 			s.draw(g);
 		}
+		camera.drawPlayer(g);
 	}
 
 	@Override
