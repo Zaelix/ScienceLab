@@ -3,6 +3,8 @@ package galaxysim;
 import java.awt.Color;
 import java.awt.Graphics;
 
+import javax.swing.ImageIcon;
+
 public class Planet extends CelestialBody {
 	private static Color[] colors = {new Color(73, 151, 254),new Color(95, 162, 217),new Color(156, 206, 247),
 			new Color(255, 255, 250), new Color(255, 242, 212), new Color(237, 220, 135), new Color(230, 170, 96)};
@@ -14,6 +16,10 @@ public class Planet extends CelestialBody {
 		color = Color.GREEN;
 		degree = GalaxySim.gen.nextInt(360);
 		GalaxySim.planets++;
+		if(starImage == null) {
+			//starImage = ImageIO.read(new File("src/galaxysim/star_rotate.jpg"));
+			starImage = new ImageIcon("src/galaxysim/star.gif").getImage();
+		}
 	}
 	
 	public void setParent(CelestialBody parent) {
@@ -22,7 +28,9 @@ public class Planet extends CelestialBody {
 		
 	}
 	private void calculateClassification() {
-		// TODO Auto-generated method stub
+		calculateSizeClassification();
+		calculateTemperature();
+		calculateHabitabilityIndex();
 		
 	}
 
@@ -40,12 +48,16 @@ public class Planet extends CelestialBody {
 	
 	private String calculateHabitabilityIndex() {
 		String habitability = "";
-		if(mass>5) {
-			
-		}
+		if(mass>5) habitability = "";
+
 		return habitability;
 	}
 	public String getInfo() {
 		return "Habitable Planet, " + super.getInfo();
+	}
+
+	@Override
+	protected void calculateTemperature() {
+		temperature = 1000;
 	}
 }

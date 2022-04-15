@@ -2,9 +2,13 @@ package galaxysim;
 
 import java.awt.Color;
 import java.awt.Graphics;
+import java.awt.Image;
+import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 
 public abstract class CelestialBody extends GameObject {
+	protected static Image starImage;
+	protected static Image planetImage;
 	CelestialBody parent;
 	ArrayList<CelestialBody> satellites;
 	Color color;
@@ -12,6 +16,7 @@ public abstract class CelestialBody extends GameObject {
 	double orbitalPeriod;
 	double orbitalHeight;
 	double degree = 0;
+	double temperature;
 	
 	CelestialBody(double x, double y, double width, double height) {
 		super(x, y, width, height);
@@ -44,7 +49,7 @@ public abstract class CelestialBody extends GameObject {
 		orbitalHeight = getDistanceFrom(parent);
 		orbitalPeriod = Math.max((100-orbitalHeight)/15, 0.1); // Magic number, change later
 	}
-	
+	protected abstract void calculateTemperature();
 	public void update() {
 		if(parent != null) orbit();
 		if(satellites != null) for(CelestialBody s : satellites) s.update();
@@ -57,11 +62,17 @@ public abstract class CelestialBody extends GameObject {
 	}
 	
 	public void draw(Graphics g) {
-		double drawx = Camera.mainCam.centerX + ((this.x - Camera.mainCam.px)*Camera.mainCam.zoom);
-		double drawy = Camera.mainCam.centerY + ((this.y - Camera.mainCam.py)*Camera.mainCam.zoom);
-
+		double relativeX = Camera.mainCam.centerX + ((this.x - Camera.mainCam.px)*Camera.mainCam.zoom);
+		double relativeY = Camera.mainCam.centerY + ((this.y - Camera.mainCam.py)*Camera.mainCam.zoom);
+		double drawX = (relativeX-(width/2*Camera.mainCam.zoom));
+		double drawY = (relativeY-(height/2*Camera.mainCam.zoom));
+		double drawWidth = Math.max(width*Camera.mainCam.zoom,2);
+		double drawHeight = Math.max(height*Camera.mainCam.zoom,2);
+		if(this instanceof Star && starImage != null) {
+			g.drawImage(starImage, (int)(drawX-(drawWidth/4.45)), (int)(drawY-(drawHeight/4.45)), (int)(drawWidth*1.45), (int)(drawHeight*1.45), null);
+		}
 		g.setColor(color);
-		g.fillOval((int)(drawx-(width/2*Camera.mainCam.zoom)), (int)(drawy-(height/2*Camera.mainCam.zoom)), (int)Math.max(width*Camera.mainCam.zoom,2), (int)Math.max(height*Camera.mainCam.zoom,2));
+		g.fillOval((int)drawX, (int)drawY, (int)drawWidth, (int)drawHeight);
 		if(satellites != null) for(CelestialBody s : satellites) s.draw(g);
 	}
 	
@@ -73,6 +84,6 @@ public abstract class CelestialBody extends GameObject {
 	}
 	
 	public String getInfo() {
-		return "Radius " + width + ", Mass " + String.format("%.2f", mass);
+		return "Radius " + width + ", Mass " + String.format("%.2f", mass) + ", Temperature: " + (int)temperature + "K";
 	}
 }

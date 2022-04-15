@@ -1,17 +1,30 @@
 package galaxysim;
 
 import java.awt.Color;
+import java.io.File;
+import java.io.IOException;
+import java.net.URL;
+
+import javax.imageio.ImageIO;
+import javax.swing.Icon;
+import javax.swing.ImageIcon;
 
 public class Star extends CelestialBody{
-	private static Color[] colors = {new Color(73, 151, 254),new Color(95, 162, 217),new Color(156, 206, 247),
-			new Color(255, 255, 250), new Color(255, 242, 212), new Color(237, 220, 135), new Color(230, 170, 96)};
+	private static int alpha = 150;
+	private static Color[] colors = {new Color(73, 151, 254,alpha),new Color(95, 162, 217,alpha),new Color(156, 206, 247,alpha),
+			new Color(255, 255, 250,alpha), new Color(255, 242, 212,alpha), new Color(237, 220, 135,alpha), new Color(230, 170, 96,alpha)};
 	private static char[] starClassifications = {'O', 'B', 'A', 'F', 'G', 'K', 'M'};
 	
 	char classification;
 	Star(double x, double y, double radius) {
 		super(x, y, radius);
-		calculateColorFromRadius(radius);
+		generateClassFromRadius(radius);
+		calculateTemperature();
 		generatePlanets();
+		if(starImage == null) {
+			//starImage = ImageIO.read(new File("src/galaxysim/star_rotate.jpg"));
+			starImage = new ImageIcon("src/galaxysim/star.gif").getImage();
+		}
 		GalaxySim.stars++;
 	}
 	Star(double x, double y, int starClass){
@@ -20,7 +33,7 @@ public class Star extends CelestialBody{
 	Star(double x, double y){
 		this(x,y, getRandomClass());
 	}
-	protected void calculateColorFromRadius(double radius) {
+	protected void generateClassFromRadius(double radius) {
 		int starClass;
 		if(radius >= 6.6) starClass = 0; // O
 		else if(radius >= 1.8) starClass = 1; // B
@@ -72,5 +85,15 @@ public class Star extends CelestialBody{
 	
 	public String getInfo() {
 		return "Class "+classification + ", "+super.getInfo();
+	}
+	@Override
+	protected void calculateTemperature() {
+		if(classification == starClassifications[0]) temperature = GalaxySim.gen.nextDouble() * 30000 + 30000;
+		else if(classification == starClassifications[1]) temperature = GalaxySim.gen.nextDouble() * 20000 + 10000;
+		else if(classification == starClassifications[2]) temperature = GalaxySim.gen.nextDouble() * 2500 + 7500;
+		else if(classification == starClassifications[3]) temperature = GalaxySim.gen.nextDouble() * 1500 + 6000;
+		else if(classification == starClassifications[4]) temperature = GalaxySim.gen.nextDouble() * 800 + 5200;
+		else if(classification == starClassifications[5]) temperature = GalaxySim.gen.nextDouble() * 1500 + 3700;
+		else temperature = GalaxySim.gen.nextDouble() * 1300 + 2400;
 	}
 }
