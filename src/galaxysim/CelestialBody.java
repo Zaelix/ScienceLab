@@ -70,9 +70,12 @@ public abstract class CelestialBody extends GameObject {
 		double drawHeight = Math.max(height*Camera.mainCam.zoom,2);
 		if(this instanceof Star && starImage != null) {
 			g.drawImage(starImage, (int)(drawX-(drawWidth/4.45)), (int)(drawY-(drawHeight/4.45)), (int)(drawWidth*1.45), (int)(drawHeight*1.45), null);
+			g.setColor(color);
+			g.fillOval((int)drawX, (int)drawY, (int)drawWidth, (int)drawHeight);
 		}
-		g.setColor(color);
-		g.fillOval((int)drawX, (int)drawY, (int)drawWidth, (int)drawHeight);
+		if(this instanceof Planet && planetImage != null) {
+			g.drawImage(planetImage, (int)drawX, (int)drawY, (int)drawWidth, (int)drawHeight, null);
+		}
 		if(satellites != null) for(CelestialBody s : satellites) s.draw(g);
 	}
 	

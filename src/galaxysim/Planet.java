@@ -16,9 +16,8 @@ public class Planet extends CelestialBody {
 		color = Color.GREEN;
 		degree = GalaxySim.gen.nextInt(360);
 		GalaxySim.planets++;
-		if(starImage == null) {
-			//starImage = ImageIO.read(new File("src/galaxysim/star_rotate.jpg"));
-			starImage = new ImageIcon("src/galaxysim/star.gif").getImage();
+		if(planetImage == null) {
+			planetImage = new ImageIcon("src/galaxysim/planet.gif").getImage();
 		}
 	}
 	
