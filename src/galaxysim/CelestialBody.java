@@ -23,10 +23,12 @@ public abstract class CelestialBody extends GameObject {
 		super(x, y, width, height);
 	}
 	
-	CelestialBody(double x, double y, double radius) {
+	CelestialBody(double x, double y, double radius, boolean needsMass) {
 		super(x, y, (int)(radius*200), (int)(radius*200));
-		calculateMassFromRadius(radius);
+		if(needsMass)calculateMassFromRadius(radius);
 	}
+	
+	
 	
 	protected void calculateMassFromRadius(double radius) {
 		if(radius >= 6.6) mass = GalaxySim.gen.nextDouble() * 50 + 16; // O
@@ -44,6 +46,10 @@ public abstract class CelestialBody extends GameObject {
 		satellite.setParent(this);
 	}
 	
+	protected void setRadius(double radius) {
+		this.width = radius*200;
+		this.height = radius*200;
+	}
 	protected void setParent(CelestialBody parent) {
 		this.parent = parent;
 		orbitalHeight = getDistanceFrom(parent);

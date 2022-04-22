@@ -14,7 +14,8 @@ public class Star extends CelestialBody{
 	char classification;
 	boolean hasCombined = false;
 	Star(double x, double y, double radius) {
-		super(x, y, radius);
+		super(x, y, radius, false);
+		setRadius(radius);
 		generateClassFromRadius(radius);
 		calculateTemperature();
 		calculateLuminosity();
@@ -26,7 +27,7 @@ public class Star extends CelestialBody{
 		GalaxySim.stars++;
 	}
 	Star(double x, double y, int starClass){
-		this(x,y,calculateRadiusFromClass(starClass));
+		this(x,y, calculateRadiusFromMass(calculateMassFromClass(starClass)));
 	}
 	Star(double x, double y){
 		this(x,y, getRandomClass());
@@ -57,17 +58,28 @@ public class Star extends CelestialBody{
 		return radius;
 	}
 	
-	public double calculateRadiusFromMass() {
+	public static double calculateMassFromClass(int starClass) {
+		double mass;
+		if(starClass == 0) mass = GalaxySim.gen.nextDouble() * 50 + 16; // O
+		else if(starClass == 1) mass = GalaxySim.gen.nextDouble() * 13.9 + 2.1; // B
+		else if(starClass == 2) mass = GalaxySim.gen.nextDouble() * 0.7 + 1.4; // A
+		else if(starClass == 3) mass = GalaxySim.gen.nextDouble() * 0.36 + 1.04; // F
+		else if(starClass == 4) mass = GalaxySim.gen.nextDouble() * 0.24 + 0.8; // G
+		else if(starClass == 5) mass = GalaxySim.gen.nextDouble() * 0.35 + 0.45; // K
+		else mass = GalaxySim.gen.nextDouble() * 0.37 + 0.08; // M
+		return mass;
+	}
+	
+	public static double calculateRadiusFromMass(double mass) {
 		double radius;
-		if(mass >= 16) radius = GalaxySim.gen.nextDouble() * 10 + 6.6;
-		else if(mass >= 2.1) radius = GalaxySim.gen.nextDouble() * 4.8 + 1.8;
-		else if(mass >= 1.4) radius = GalaxySim.gen.nextDouble() * 0.4 + 1.4;
-		else if(mass >= 1.04) radius = GalaxySim.gen.nextDouble() * 0.25 + 1.15;
-		else if(mass >= 0.8) radius = GalaxySim.gen.nextDouble() * 0.19 + 0.96;
-		else if(mass >= 0.45) radius = GalaxySim.gen.nextDouble() * 0.26 + 0.7;
-		else radius = GalaxySim.gen.nextDouble() * 0.7 + 0.3;
-		this.width = radius*200;
-		this.height = radius*200;
+//		if(mass >= 16) radius = GalaxySim.gen.nextDouble() * 10 + 6.6;
+//		else if(mass >= 2.1) radius = GalaxySim.gen.nextDouble() * 4.8 + 1.8;
+//		else if(mass >= 1.4) radius = GalaxySim.gen.nextDouble() * 0.4 + 1.4;
+//		else if(mass >= 1.04) radius = GalaxySim.gen.nextDouble() * 0.25 + 1.15;
+//		else if(mass >= 0.8) radius = GalaxySim.gen.nextDouble() * 0.19 + 0.96;
+//		else if(mass >= 0.45) radius = GalaxySim.gen.nextDouble() * 0.26 + 0.7;
+//		else radius = GalaxySim.gen.nextDouble() * 0.7 + 0.3;
+		radius = 1.08475*Math.pow(mass, 0.64902)+0.0414486;
 		return radius;
 	}
 	
@@ -126,7 +138,8 @@ public class Star extends CelestialBody{
 			trash = other;
 		}
 		survivor.mass += trash.mass;
-		double r = survivor.calculateRadiusFromMass();
+		double r = Star.calculateRadiusFromMass(survivor.mass);
+		survivor.setRadius(r);
 		survivor.calculateTemperature();
 		survivor.calculateLuminosity();
 		survivor.generateClassFromRadius(r);
