@@ -8,6 +8,11 @@ public abstract class GameObject {
 	double width;
 	double height;
 	
+	double drawX;
+	double drawY;
+	double drawWidth;
+	double drawHeight;
+	
 	GameObject(double x,double y, double width, double height){
 		this.x = x;
 		this.y = y;

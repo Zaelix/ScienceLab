@@ -7,6 +7,7 @@ import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 
 public abstract class CelestialBody extends GameObject {
+	String currentSector;
 	protected static Image starImage;
 	protected static Image planetImage;
 	CelestialBody parent;
@@ -21,8 +22,9 @@ public abstract class CelestialBody extends GameObject {
 	CelestialBody(double x, double y, double width, double height) {
 		super(x, y, width, height);
 	}
+	
 	CelestialBody(double x, double y, double radius) {
-		super(x, y, (int)(radius*100), (int)(radius*100));
+		super(x, y, (int)(radius*200), (int)(radius*200));
 		calculateMassFromRadius(radius);
 	}
 	
@@ -35,8 +37,6 @@ public abstract class CelestialBody extends GameObject {
 		else if(radius >= 0.7) mass = GalaxySim.gen.nextDouble() * 0.35 + 0.45; // K
 		else mass = GalaxySim.gen.nextDouble() * 0.37 + 0.08; // M
 	}
-	
-	
 	
 	protected void addSatellite(CelestialBody satellite) {
 		if(satellites == null) satellites = new ArrayList<CelestialBody>();
@@ -62,31 +62,21 @@ public abstract class CelestialBody extends GameObject {
 	}
 	
 	public void draw(Graphics g) {
-		double relativeX = Camera.mainCam.centerX + ((this.x - Camera.mainCam.px)*Camera.mainCam.zoom);
-		double relativeY = Camera.mainCam.centerY + ((this.y - Camera.mainCam.py)*Camera.mainCam.zoom);
-		double drawX = (relativeX-(width/2*Camera.mainCam.zoom));
-		double drawY = (relativeY-(height/2*Camera.mainCam.zoom));
-		double drawWidth = Math.max(width*Camera.mainCam.zoom,2);
-		double drawHeight = Math.max(height*Camera.mainCam.zoom,2);
-		if(this instanceof Star && starImage != null) {
-			g.drawImage(starImage, (int)(drawX-(drawWidth/4.45)), (int)(drawY-(drawHeight/4.45)), (int)(drawWidth*1.45), (int)(drawHeight*1.45), null);
-			g.setColor(color);
-			g.fillOval((int)drawX, (int)drawY, (int)drawWidth, (int)drawHeight);
-		}
-		if(this instanceof Planet && planetImage != null) {
-			g.drawImage(planetImage, (int)drawX, (int)drawY, (int)drawWidth, (int)drawHeight, null);
-		}
+		drawX = (Camera.mainCam.centerX + ((this.x - Camera.mainCam.px)*Camera.mainCam.zoom)-(width/2*Camera.mainCam.zoom));
+		drawY = (Camera.mainCam.centerY + ((this.y - Camera.mainCam.py)*Camera.mainCam.zoom)-(height/2*Camera.mainCam.zoom));
+		drawWidth = Math.max(width*Camera.mainCam.zoom,2);
+		drawHeight = Math.max(height*Camera.mainCam.zoom,2);
 		if(satellites != null) for(CelestialBody s : satellites) s.draw(g);
 	}
 	
 	public boolean wasClicked(int x, int y) {
 		double drawx = Camera.mainCam.centerX + ((this.x - Camera.mainCam.px)*Camera.mainCam.zoom);
 		double drawy = Camera.mainCam.centerY + ((this.y - Camera.mainCam.py)*Camera.mainCam.zoom);
-		if(getDistanceFrom(drawx, drawy,x,y) < width/2) return true;
+		if(getDistanceFrom(drawx, drawy,x,y) < drawWidth/2) return true;
 		return false;
 	}
 	
 	public String getInfo() {
-		return "Radius " + width + ", Mass " + String.format("%.2f", mass) + ", Temperature: " + (int)temperature + "K";
+		return "Radius " + String.format("%.2f", width) + ", Mass " + String.format("%.2f", mass) + ", Temperature: " + (int)temperature + "K";
 	}
 }

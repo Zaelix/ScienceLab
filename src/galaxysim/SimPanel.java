@@ -56,7 +56,7 @@ public class SimPanel extends JPanel implements KeyListener, ActionListener, Mou
 				}
 			}
 			System.out.println(stars + "/" + GalaxySim.stars + " stars and " + planets + "/" + GalaxySim.planets
-					+ " planets currently loaded.");
+					+ " planets  in "+ GalaxySim.sectors.size() + " sectors currently loaded.");
 		}
 
 	}

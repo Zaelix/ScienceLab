@@ -45,11 +45,22 @@ public class GalaxySim implements ActionListener {
 		SectorPosition pos = new SectorPosition(x,y);
 		Sector s = new Sector(pos);
 		sectors.put(pos.toString(), s);
+		s.regenerate();
 	}
 	
 	public static Sector getCurrentSector(double x, double y) {
 		for(Sector s : sectors.values()) {
 			if(x>s.position.x*Sector.WIDTH - Sector.WIDTH/2 && x<(s.position.x)*Sector.WIDTH + Sector.WIDTH/2 && y>s.position.y*Sector.HEIGHT - Sector.HEIGHT/2 && y<(s.position.y)*Sector.HEIGHT + Sector.HEIGHT/2) {
+				return s;
+			}
+		}
+		return null;
+	}
+	
+	public static Sector getSectorByName(String sectorName) {
+		for(Sector s : sectors.values()) {
+			//System.out.println("Comparing " + sectorName + " to " + s.name);
+			if(s.name.equals(sectorName)) {
 				return s;
 			}
 		}

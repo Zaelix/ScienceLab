@@ -6,19 +6,20 @@ import java.awt.Graphics;
 import javax.swing.ImageIcon;
 
 public class Planet extends CelestialBody {
-	private static Color[] colors = {new Color(73, 151, 254),new Color(95, 162, 217),new Color(156, 206, 247),
-			new Color(255, 255, 250), new Color(255, 242, 212), new Color(237, 220, 135), new Color(230, 170, 96)};
+	private static int alpha = 150;
+	private static Color[] colors = {new Color(200,0,0, alpha),new Color(0,200,0, alpha),new Color(0,0,200, alpha)};
 	private static char[] planetClassifications = {'D', 'J', 'H', 'K', 'L', 'M', 'N'};
 	
-	char classification;
+	String classification;
 	Planet(double x, double y, double width, double height) {
 		super(x, y, width, height);
-		color = Color.GREEN;
+		color = colors[0];
 		degree = GalaxySim.gen.nextInt(360);
 		GalaxySim.planets++;
 		if(planetImage == null) {
 			planetImage = new ImageIcon("src/galaxysim/planet.gif").getImage();
 		}
+		calculateMassFromRadius(width/200);
 	}
 	
 	public void setParent(CelestialBody parent) {
@@ -27,36 +28,59 @@ public class Planet extends CelestialBody {
 		
 	}
 	private void calculateClassification() {
-		calculateSizeClassification();
+		classification = calculateSizeClassification();
 		calculateTemperature();
-		calculateHabitabilityIndex();
-		
+		classification += " "+calculateHabitabilityIndex();
 	}
 
 	private String calculateSizeClassification() {
 		String sizeClass;
-		if(width < 0.01)sizeClass = "Asteroidal";
-		else if(width < 0.5)sizeClass = "Subterran";
-		else if(width < 2)sizeClass = "Terran";
-		else if(width < 10)sizeClass = "Superterran";
-		else if(width < 50) sizeClass = "Megaterran";
-		else if(width < 5000)sizeClass = "Ultraterran";
-		else sizeClass = "Omegaterran";
+		if(width <= 12)sizeClass = "Asteroidal";
+		else if(width < 15)sizeClass = "Subterran";
+		else if(width < 25)sizeClass = "Terran";
+		else if(width < 35)sizeClass = "Superterran";
+		else if(width < 70) sizeClass = "Subgiant";
+		else if(width < 5000)sizeClass = "Giant";
+		else sizeClass = "Supergiant";
 		return sizeClass;
 	}
 	
 	private String calculateHabitabilityIndex() {
 		String habitability = "";
-		if(mass>5) habitability = "";
+		if(temperature<200) {
+			habitability = "Frozen World";
+			color = colors[2];
+		}
+		else if(temperature<300) {
+			habitability = "Habitable World";
+			color = colors[1];
+		}
+		else {
+			habitability = "Desert World";
+			color = colors[0];
+		}
 
 		return habitability;
 	}
 	public String getInfo() {
-		return "Habitable Planet, " + super.getInfo();
+		return classification + ", " + super.getInfo();
 	}
 
 	@Override
 	protected void calculateTemperature() {
-		temperature = 1000;
+		if(parent instanceof Star) {
+			double lum = ((Star) parent).luminosity;
+			temperature = lum / Math.pow(getDistanceFrom(parent)/150,2);
+		}
+		else temperature = -1;
+	}
+	
+	public void draw(Graphics g) {
+		super.draw(g);
+		if(planetImage != null) {
+			g.drawImage(planetImage, (int)drawX, (int)drawY, (int)drawWidth, (int)drawHeight, null);
+		}
+		g.setColor(color);
+		g.fillOval((int)drawX, (int)drawY, (int)drawWidth, (int)drawHeight);
 	}
 }

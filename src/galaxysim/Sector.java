@@ -12,16 +12,25 @@ public class Sector {
 	public Sector(SectorPosition position) {
 		this.position = position;
 		this.name = "Sector " + (position.x < 0 ? "N"+-position.x : "P"+position.x) + "-" + (position.y < 0 ? "N"+-position.y : "P"+position.y);
-		regenerate();
+		//regenerate();
 	}
 	public void regenerate() {
 		stars.clear();
 		int density = Math.min(Math.max(calculateDensityVariation() + GalaxySim.gen.nextInt(40) - 20, 5), 200);
 		int failed = 0;
 		for (int i = 0; i < density; i++) {
-			if(!generateStar()) failed++;
+			if(!generateStar()) {
+				failed++;
+				Star newStar = getRandomStar();
+				Star combiner = new Star(newStar.x, newStar.y);
+				addStar(combiner);
+				if(newStar != null && combiner != null) {
+					newStar.combineWith(combiner);
+				}
+			}
 		}
-		System.out.println("Generating " + name + " failed on " + failed + "/" + density + " stars.");
+		if(failed > 0) System.out.println("Generating " + name + " failed on " + failed + "/" + density + " stars.");
+		else System.out.println("Generating " + name + " succeeded. " + density + " stars created.");
 	}
 	
 	public int calculateDensityVariation() {
@@ -50,7 +59,7 @@ public class Sector {
 			attempts++;
 		}
 		if(attempts < 1000) {
-			stars.add(star);
+			addStar(star);
 			return true;
 		}
 		else {
@@ -60,12 +69,25 @@ public class Sector {
 			return false;
 		}
 	}
+	
+	public Star getRandomStar() {
+		return stars.get(GalaxySim.gen.nextInt(stars.size()));
+	}
+	
+	public void addStar(Star star) {
+		star.currentSector = this.name;
+		stars.add(star);
+	}
+	
+	public void removeStar(Star star) {
+		stars.remove(star);
+	}
 
 	private boolean checkIfStarIsViable(Star star) {
 		boolean isClear = true;
 		for(Sector s : getSectorGroup()) {
 			for (Star other : s.stars) {
-				double minAllowedDistance = star.mass * 500 + other.mass * 500;
+				double minAllowedDistance = (star.mass * 400 + star.width) + (other.mass * 400 + other.width);
 				if (star.getDistanceFrom(other) < minAllowedDistance)
 					isClear = false;
 			}
@@ -127,5 +149,9 @@ public class Sector {
 		for (CelestialBody s : stars) {
 			s.update();
 		}
+	}
+	
+	public String toString() {
+		return name;
 	}
 }
