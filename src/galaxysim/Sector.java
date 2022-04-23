@@ -8,6 +8,7 @@ public class Sector {
 	public static final int HEIGHT = 9000;
 	String name;
 	ArrayList<Star> stars = new ArrayList<Star>();
+	ArrayList<Star> failedStars = new ArrayList<Star>();
 	SectorPosition position;
 	public Sector(SectorPosition position) {
 		this.position = position;
@@ -21,16 +22,20 @@ public class Sector {
 		for (int i = 0; i < density; i++) {
 			if(!generateStar()) {
 				failed++;
-				Star newStar = getRandomStar();
-				Star combiner = new Star(newStar.x, newStar.y);
-				addStar(combiner);
-				if(newStar != null && combiner != null) {
-					newStar.combineWith(combiner);
-				}
+				
 			}
 		}
+		
 		if(failed > 0) System.out.println("Generating " + name + " failed on " + failed + "/" + density + " stars.");
 		else System.out.println("Generating " + name + " succeeded. " + density + " stars created.");
+		for(Star star : failedStars) {
+			Star newStar = getRandomStar();
+			addStar(star);
+			if(newStar != null && star != null) {
+				newStar.combineWith(star);
+			}
+		}
+		failedStars.clear();
 	}
 	
 	public int calculateDensityVariation() {
@@ -64,6 +69,7 @@ public class Sector {
 		}
 		else {
 			//System.out.println("WARNING: Failed to place star.");
+			failedStars.add(star);
 			GalaxySim.stars--;
 			if(star.satellites != null) GalaxySim.planets-=star.satellites.size();
 			return false;
@@ -146,8 +152,9 @@ public class Sector {
 	}
 	
 	public void update() {
-		for (CelestialBody s : stars) {
-			s.update();
+		for(int i = stars.size()-1; i >= 0; i--) {
+			stars.get(i).update();
+			if(i>=stars.size()) i = stars.size()-1;
 		}
 	}
 	
