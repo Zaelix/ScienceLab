@@ -25,6 +25,7 @@ public class Star extends CelestialBody {
 		this.mass = mass;
 		calculateTemperature();
 		calculateLuminosity();
+		calculateMinMaxSatelliteHeight();
 		generatePlanets();
 		if (starImage == null) {
 			// starImage = ImageIO.read(new File("src/galaxysim/star_rotate.jpg"));
@@ -129,33 +130,29 @@ public class Star extends CelestialBody {
 		int count = GalaxySim.gen.nextInt((int) (mass * 8) + 2);
 		for (int i = 0; i < count; i++) {
 			int scaleMod = GalaxySim.gen.nextInt(3) + 4;
-			double dx = GalaxySim.gen.nextDouble() * (mass * 400) + (width);
+			double dx = GalaxySim.gen.nextDouble() * maxSatelliteHeight + minSatelliteHeight;
 			Planet p = new Planet(x + dx, y, width / scaleMod, height / scaleMod);
 			addSatellite(p);
 		}
 		// System.out.println(count + " planets created.");
 	}
+	
+	
 
 	public String getInfo() {
 		return "Class " + classification + ", " + super.getInfo() + ", Luminosity " + String.format("%.1f", luminosity);
 	}
 
+	protected void reassessStatus() {
+		generateClassFromRadius(calculateRadiusFromMass(mass));
+		calculateTemperature();
+		calculateLuminosity();
+		calculateMinMaxSatelliteHeight();
+		checkIfOrbitIsStable();
+	}
 	@Override
 	protected void calculateTemperature() {
-		if (classification == starClassifications[0])
-			temperature = GalaxySim.gen.nextDouble() * 30000 + 30000;
-		else if (classification == starClassifications[1])
-			temperature = GalaxySim.gen.nextDouble() * 20000 + 10000;
-		else if (classification == starClassifications[2])
-			temperature = GalaxySim.gen.nextDouble() * 2500 + 7500;
-		else if (classification == starClassifications[3])
-			temperature = GalaxySim.gen.nextDouble() * 1500 + 6000;
-		else if (classification == starClassifications[4])
-			temperature = GalaxySim.gen.nextDouble() * 800 + 5200;
-		else if (classification == starClassifications[5])
-			temperature = GalaxySim.gen.nextDouble() * 1500 + 3700;
-		else
-			temperature = GalaxySim.gen.nextDouble() * 1300 + 2400;
+		temperature = 8060.83*Math.pow(mass, 0.496634) - 1929.9;
 	}
 
 	protected void calculateLuminosity() {
@@ -174,27 +171,33 @@ public class Star extends CelestialBody {
 			trash = other;
 		}
 		System.out.println("Combining stars with masses " + survivor.mass + " and " + trash.mass);
-		survivor.mass += trash.mass;
-		double r = Star.calculateRadiusFromMass(survivor.mass);
-		survivor.setRadius(r);
-		survivor.calculateTemperature();
-		survivor.calculateLuminosity();
-		survivor.generateClassFromRadius(r);
+		absorb(trash);
 		Sector s = GalaxySim.getSectorByName(trash.currentSector);
 		if (s != null)
 			s.removeStar(trash);
 		else
 			System.out.println(trash.currentSector + " is an invalid Sector.");
 		GalaxySim.stars--;
-		if (trash.satellites != null)
-			GalaxySim.planets -= trash.satellites.size();
 
 		hasCombined = true;
 		other.hasCombined = true;
 	}
+	
+	protected void absorb(CelestialBody body) {
+		mass += body.mass;
+		double r = Star.calculateRadiusFromMass(mass);
+		setRadius(r);
+		generateClassFromRadius(r);
+		calculateTemperature();
+		calculateLuminosity();
+		if(satellites.contains(body))body.setParent(null);
+		stealAllSatellitesFrom(body);
+		calculateMinMaxSatelliteHeight();
+		forceSatellitesToRecalculateStatus();
+		findVictimBodies();
+	}
 
-	public void draw(Graphics g) {
-		super.draw(g);
+	public void customDraw(Graphics g) {
 		if (starImage != null) {
 			g.drawImage(starImage, (int) (drawX - (drawWidth / 4.45)), (int) (drawY - (drawHeight / 4.45)),
 					(int) (drawWidth * 1.45), (int) (drawHeight * 1.45), null);
@@ -203,16 +206,15 @@ public class Star extends CelestialBody {
 		g.fillOval((int) drawX, (int) drawY, (int) drawWidth, (int) drawHeight);
 		if (hasCombined) {
 			g.setColor(Color.CYAN);
-			g.drawOval((int) (drawX - (int) (drawWidth / 2)), (int) (drawY - (int) (drawHeight / 2)),
-					(int) (drawWidth * 2), (int) (drawHeight * 2));
+			//g.drawOval((int) (drawX - (int) (drawWidth / 2)), (int) (drawY - (int) (drawHeight / 2)),
+			//		(int) (drawWidth * 2), (int) (drawHeight * 2));
 		}
 	}
 
 	public void findVictimBodies() {
-		double minDist = mass * 300 + width;
-		for (Sector sector : GalaxySim.currentSector.getSectorGroup()) {
+		for (Sector sector : GalaxySim.getSectorByName(currentSector).getSectorGroup()) {
 			for (Star star : sector.stars) {
-				if (star.mass < this.mass / 2 && star.getDistanceFrom(this) < minDist && !victims.contains(star)) {
+				if (star.mass < this.mass && star.getDistanceFrom(this) < maxSatelliteHeight && !victims.contains(star)) {
 					victims.add(star);
 				}
 			}

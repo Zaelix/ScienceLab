@@ -93,7 +93,7 @@ public class Sector {
 		boolean isClear = true;
 		for(Sector s : getSectorGroup()) {
 			for (Star other : s.stars) {
-				double minAllowedDistance = (star.mass * 400 + star.width) + (other.mass * 400 + other.width);
+				double minAllowedDistance = star.maxSatelliteHeight + other.maxSatelliteHeight;
 				if (star.getDistanceFrom(other) < minAllowedDistance)
 					isClear = false;
 			}

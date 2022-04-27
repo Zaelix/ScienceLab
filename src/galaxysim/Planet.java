@@ -25,7 +25,6 @@ public class Planet extends CelestialBody {
 	public void setParent(CelestialBody parent) {
 		super.setParent(parent);
 		calculateClassification();
-		
 	}
 	private void calculateClassification() {
 		classification = calculateSizeClassification();
@@ -66,7 +65,11 @@ public class Planet extends CelestialBody {
 		return classification + ", " + super.getInfo();
 	}
 
-	@Override
+	protected void reassessStatus() {
+		calculateClassification();
+		checkIfOrbitIsStable();
+	}
+	
 	protected void calculateTemperature() {
 		if(parent instanceof Star) {
 			double lum = ((Star) parent).luminosity;
@@ -74,9 +77,12 @@ public class Planet extends CelestialBody {
 		}
 		else temperature = -1;
 	}
-	
-	public void draw(Graphics g) {
-		super.draw(g);
+	protected void absorb(CelestialBody body) {
+		mass += body.mass;
+		calculateClassification();
+		stealAllSatellitesFrom(body);
+	}
+	public void customDraw(Graphics g) {
 		if(planetImage != null) {
 			g.drawImage(planetImage, (int)drawX, (int)drawY, (int)drawWidth, (int)drawHeight, null);
 		}

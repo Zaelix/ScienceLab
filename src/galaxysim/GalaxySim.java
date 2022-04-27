@@ -85,6 +85,16 @@ public class GalaxySim implements ActionListener {
 		List<Sector> valuesList = new ArrayList<Sector>(sectors.values());
 		return valuesList.get(new Random().nextInt(valuesList.size()));
 	}
+	
+	public static Sector getRandomSectorInSectorGroup() {
+		List<Sector> group = currentSector.getSectorGroup();
+		return group.get(gen.nextInt(group.size()));
+	}
+	
+	public static Sector getRandomSectorInCurrentSectorNeighbors() {
+		List<Sector> group = currentSector.getNeighboringSectors();
+		return group.get(gen.nextInt(group.size()));
+	}
 
 	@Override
 	public void actionPerformed(ActionEvent e) {
@@ -103,6 +113,17 @@ public class GalaxySim implements ActionListener {
 		else if(e.getSource() == mergeSearchTimer) {
 			Sector sector = getRandomSector();
 			for(Star star : sector.stars) {
+				if(star.hasCombined) {
+					star.findVictimBodies();
+				}
+			}
+			for(Star star : currentSector.stars) {
+				if(star.hasCombined) {
+					star.findVictimBodies();
+				}
+			}
+			Sector neighbor = getRandomSectorInCurrentSectorNeighbors();
+			for(Star star : neighbor.stars) {
 				if(star.hasCombined) {
 					star.findVictimBodies();
 				}
