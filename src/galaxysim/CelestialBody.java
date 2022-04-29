@@ -65,8 +65,8 @@ public abstract class CelestialBody extends GameObject {
 	}
 
 	protected void setRadius(double radius) {
-		this.width = radius * 200;
-		this.height = radius * 200;
+		this.width = radius * 100 + 50;
+		this.height = radius * 100 + 50;
 	}
 
 	protected void setParent(CelestialBody parent) {
@@ -104,7 +104,7 @@ public abstract class CelestialBody extends GameObject {
 	}
 
 	public void deOrbit() {
-		orbitalHeight -= 100 / orbitalHeight;
+		orbitalHeight -= 500 / orbitalHeight;
 		if (orbitalHeight < parent.width/2)
 			parent.absorb(this);
 	}
@@ -141,7 +141,7 @@ public abstract class CelestialBody extends GameObject {
 				s.draw(g);
 				if(!s.inStableOrbit) {
 					g.setColor(Color.PINK);
-					//g.drawLine((int)drawX, (int)drawY, (int)s.drawX, (int)s.drawY);
+					//g.drawLine((int)(drawX+(drawWidth/2)), (int)(drawY+(drawHeight/2)), (int)(s.drawX + (s.drawWidth/2)), (int)(s.drawY + (s.drawHeight/2)));
 				}
 			}
 		}

@@ -41,6 +41,11 @@ public class GalaxySim implements ActionListener {
 		frame.addKeyListener(panel);
 		frame.addMouseListener(panel);
 		frame.pack();
+		
+		long seed = gen.nextLong();
+		System.out.println("Seed: "+seed);
+		gen = new Random(seed);
+		
 		timer = new Timer(1000 / 60, panel);
 		currentSectorTimer = new Timer(1000 / 3, this);
 		mergeSearchTimer = new Timer(1000, this);
@@ -103,7 +108,7 @@ public class GalaxySim implements ActionListener {
 			if (currentSector != null) {
 				if (!currentSector.name.equals(currentSectorName)) {
 					currentSector.generateNeighbors();
-					panel.currentSectorGroup = currentSector.getSectorGroup();
+					panel.currentSectorGroup = currentSector.getSectorGroup(3);
 				}
 				currentSectorName = currentSector.name;
 			} else

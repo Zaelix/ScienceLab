@@ -22,7 +22,7 @@ public class Camera {
 	double speed = 5;
 	
 	private int[] shipXs = new int[] {GalaxySim.WIDTH/2 - 10, GalaxySim.WIDTH/2, GalaxySim.WIDTH/2 + 10};
-	private int[] shipYs = new int[] {GalaxySim.HEIGHT/2 + 10, GalaxySim.HEIGHT/2 - 10, GalaxySim.HEIGHT/2 + 10};;
+	private int[] shipYs = new int[] {GalaxySim.HEIGHT/2 + 10, GalaxySim.HEIGHT/2 - 10, GalaxySim.HEIGHT/2 + 10};
 	
 	public Camera(double x, double y) {
 		this.x = x;

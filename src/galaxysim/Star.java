@@ -103,7 +103,8 @@ public class Star extends CelestialBody {
 	}
 
 	public static double calculateRadiusFromMass(double mass) {
-		return 1.08475 * Math.pow(mass, 0.64902) + 0.0414486;
+		//return 1.08475 * Math.pow(mass, 0.64902) + 0.0414486;
+		return 1.0348 * Math.pow(mass, 0.663168) + 0.0941639;
 	}
 
 	public static int getRandomClass() {
@@ -156,8 +157,8 @@ public class Star extends CelestialBody {
 	}
 
 	protected void calculateLuminosity() {
-		double surfaceArea = 4 * Math.PI * Math.pow(width, 2);
-		luminosity = (temperature / surfaceArea) * (2 * Math.PI * Math.pow(width, 2));
+		double surfaceArea = 4 * Math.PI * Math.pow(width/2, 2);
+		luminosity = (temperature / surfaceArea) * (2 * Math.PI * Math.pow(width/2, 2));
 	}
 
 	protected void combineWith(Star other) {
@@ -214,7 +215,7 @@ public class Star extends CelestialBody {
 	public void findVictimBodies() {
 		for (Sector sector : GalaxySim.getSectorByName(currentSector).getSectorGroup()) {
 			for (Star star : sector.stars) {
-				if (star.mass < this.mass && star.getDistanceFrom(this) < maxSatelliteHeight && !victims.contains(star)) {
+				if (star.mass < this.mass && star.getDistanceFrom(this) < maxSatelliteHeight+minSatelliteHeight && !victims.contains(star)) {
 					victims.add(star);
 				}
 			}
