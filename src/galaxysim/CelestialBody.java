@@ -84,7 +84,7 @@ public abstract class CelestialBody extends GameObject {
 	protected abstract void reassessStatus();
 	protected abstract void calculateTemperature();
 
-	public void update() {
+	public void customUpdate() {
 		if (parent != null)
 			orbit();
 		for (CelestialBody s : satellites)

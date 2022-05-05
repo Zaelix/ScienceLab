@@ -16,7 +16,7 @@ public class GalaxySim implements ActionListener {
 
 	public static final int WIDTH = 1600;
 	public static final int HEIGHT = 900;
-	public static Random gen = new Random();
+	public static Random gen = new Random(-6461756828592062191L);
 	public static int stars;
 	public static int planets;
 	public static String currentSectorName = "";

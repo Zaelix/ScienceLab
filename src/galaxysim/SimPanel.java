@@ -14,12 +14,15 @@ import javax.swing.JPanel;
 
 public class SimPanel extends JPanel implements KeyListener, ActionListener, MouseListener {
 	Camera camera;
+	Ship currentShip;
 	public ArrayList<Sector> currentSectorGroup = new ArrayList<Sector>();
 
 	public SimPanel() {
 		camera = new Camera(GalaxySim.WIDTH / 2, GalaxySim.HEIGHT / 2);
 		GalaxySim.generateSector(0, 0);
 		System.out.println("Generated " + GalaxySim.stars + " stars and " + GalaxySim.planets + " planets.");
+		currentShip = new Ship(camera.centerX,camera.centerY, 100,100);
+		camera.currentShip = currentShip;
 	}
 
 	@Override
@@ -34,16 +37,22 @@ public class SimPanel extends JPanel implements KeyListener, ActionListener, Mou
 		}
 		if (keyCode == 65) { // A key
 			camera.left = true;
+			currentShip.left = true;
 		}
 		if (keyCode == 68) { // D key
 			camera.right = true;
+			currentShip.right = true;
 		}
 		if (keyCode == 87) { // W key
 			camera.up = true;
+			currentShip.up = true;
 		}
 		if (keyCode == 83) { // S key
 			camera.down = true;
+			currentShip.down = true;
 		}
+		if(keyCode == 37) currentShip.angle--;
+		if(keyCode == 39) currentShip.angle++;
 		if (keyCode == 32) {
 			int stars = 0;
 			int planets = 0;
@@ -72,15 +81,19 @@ public class SimPanel extends JPanel implements KeyListener, ActionListener, Mou
 		}
 		if (keyCode == 65) { // A key
 			camera.left = false;
+			currentShip.left = false;
 		}
 		if (keyCode == 68) { // D key
 			camera.right = false;
+			currentShip.right = false;
 		}
 		if (keyCode == 87) { // W key
 			camera.up = false;
+			currentShip.up = false;
 		}
 		if (keyCode == 83) { // S key
 			camera.down = false;
+			currentShip.down = false;
 		}
 	}
 
@@ -96,13 +109,14 @@ public class SimPanel extends JPanel implements KeyListener, ActionListener, Mou
 		for (Sector s : currentSectorGroup) {
 			s.draw(g);
 		}
+		currentShip.draw(g);
 		camera.drawPlayer(g);
 	}
 
 	@Override
 	public void actionPerformed(ActionEvent e) {
+		currentShip.update();
 		camera.update();
-
 		for (Sector s : currentSectorGroup) {
 			s.update();
 		}

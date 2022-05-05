@@ -196,7 +196,7 @@ public class Sector {
 			if (i >= stars.size())
 				i = stars.size() - 1;
 		}
-		getRandomStar().findVictimBodies();
+		if(stars.size() > 0 ) getRandomStar().findVictimBodies();
 	}
 
 	public String toString() {

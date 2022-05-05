@@ -1,10 +1,10 @@
 package galaxysim;
 
-import java.awt.Color;
 import java.awt.Graphics;
 
 public class Camera {
 	public static Camera mainCam;
+	public Ship currentShip;
 	public double zoom = 1;
 	public double x;
 	public double y;
@@ -32,10 +32,16 @@ public class Camera {
 		if(mainCam == null) mainCam = this;
 	}
 	public void update() {
-		if(up) y-=speed/zoom;
-		if(down) y+=speed/zoom;
-		if(left) x-=speed/zoom;
-		if(right) x+=speed/zoom;
+		if(currentShip == null) {
+			if(up) y-=speed/zoom;
+			if(down) y+=speed/zoom;
+			if(left) x-=speed/zoom;
+			if(right) x+=speed/zoom;
+		}
+		else {
+			x = currentShip.x-centerX-currentShip.width/2;
+			y = currentShip.y-centerY-currentShip.height/2;
+		}
 
 		if(zoomIn) setZoom(zoom+0.01);
 		if(zoomOut) setZoom(zoom-0.01);
@@ -49,7 +55,8 @@ public class Camera {
 		this.zoom = zoom;
 	}
 	public void drawPlayer(Graphics g) {
-		g.setColor(Color.BLUE);
-		g.fillPolygon(shipXs, shipYs, 3);
+		//g.setColor(Color.BLUE);
+		//g.fillPolygon(shipXs, shipYs, 3);
+		//ship.draw(g);
 	}
 }

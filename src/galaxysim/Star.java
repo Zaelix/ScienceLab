@@ -171,8 +171,8 @@ public class Star extends CelestialBody {
 			survivor = this;
 			trash = other;
 		}
-		System.out.println("Combining stars with masses " + survivor.mass + " and " + trash.mass);
-		absorb(trash);
+		//System.out.println("Combining stars with masses " + survivor.mass + " and " + trash.mass);
+		survivor.absorb(trash);
 		Sector s = GalaxySim.getSectorByName(trash.currentSector);
 		if (s != null)
 			s.removeStar(trash);
@@ -228,8 +228,8 @@ public class Star extends CelestialBody {
 			double dx = x - victim.x;
 			double dy = y - victim.y;
 			double dist = victim.getDistanceFrom(this);
-			victim.x += dx / dist;
-			victim.y += dy / dist;
+			victim.xVelocity += (mass*dx) / Math.pow(dist,2);
+			victim.yVelocity += (mass*dy) / Math.pow(dist,2);
 			if (dist < width / 3) {
 				combineWith(victim);
 				victims.remove(i);
@@ -237,8 +237,8 @@ public class Star extends CelestialBody {
 		}
 	}
 
-	public void update() {
-		super.update();
+	public void customUpdate() {
+		super.customUpdate();
 		if (victims.size() > 0)
 			attractVictims();
 	}
