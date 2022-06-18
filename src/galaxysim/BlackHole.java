@@ -36,14 +36,6 @@ public class BlackHole extends Star {
 		forceSatellitesToRecalculateStatus();
 		findVictimBodies();
 	}
-	public void migrate() {
-		Sector current = GalaxySim.getCurrentSector(x, y);
-		if(!current.name.equals(currentSector)) {
-			Sector previous = GalaxySim.getSectorByName(currentSector);
-			previous.removeStar(this);
-			current.addStar(this);
-		}
-	}
 	
 	@Override
 	public void customDraw(Graphics g) {

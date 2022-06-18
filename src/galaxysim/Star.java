@@ -201,7 +201,16 @@ public class Star extends CelestialBody {
 		forceSatellitesToRecalculateStatus();
 		findVictimBodies();
 	}
-
+	
+	public void migrate() {
+		Sector current = GalaxySim.getCurrentSector(x, y);
+		if(!current.name.equals(currentSector)) {
+			Sector previous = GalaxySim.getSectorByName(currentSector);
+			previous.removeStar(this);
+			current.addStar(this);
+		}
+	}
+	
 	public void customDraw(Graphics g) {
 		if (starImage != null) {
 			g.drawImage(starImage, (int) (drawX - (drawWidth / 4.45)), (int) (drawY - (drawHeight / 4.45)),
@@ -250,5 +259,6 @@ public class Star extends CelestialBody {
 		super.customUpdate();
 		if (victims.size() > 0)
 			attractVictims();
+		
 	}
 }

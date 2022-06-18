@@ -21,7 +21,7 @@ public class GalaxySim implements ActionListener {
 	public static int planets;
 	public static String currentSectorName = "";
 	public static Sector currentSector;
-	
+
 	JFrame frame = new JFrame();
 	Timer timer;
 	Timer currentSectorTimer;
@@ -41,11 +41,11 @@ public class GalaxySim implements ActionListener {
 		frame.addKeyListener(panel);
 		frame.addMouseListener(panel);
 		frame.pack();
-		
+
 		long seed = gen.nextLong();
-		System.out.println("Seed: "+seed);
+		System.out.println("Seed: " + seed);
 		gen = new Random(seed);
-		
+
 		timer = new Timer(1000 / 60, panel);
 		currentSectorTimer = new Timer(1000 / 3, this);
 		mergeSearchTimer = new Timer(1000, this);
@@ -81,21 +81,21 @@ public class GalaxySim implements ActionListener {
 		}
 		return null;
 	}
-	
+
 	public static Sector getSectorByPosition(int x, int y) {
-		return sectors.get("["+x+","+y+"]");
+		return sectors.get("[" + x + "," + y + "]");
 	}
-	
+
 	public static Sector getRandomSector() {
 		List<Sector> valuesList = new ArrayList<Sector>(sectors.values());
 		return valuesList.get(new Random().nextInt(valuesList.size()));
 	}
-	
+
 	public static Sector getRandomSectorInSectorGroup() {
 		List<Sector> group = currentSector.getSectorGroup();
 		return group.get(gen.nextInt(group.size()));
 	}
-	
+
 	public static Sector getRandomSectorInCurrentSectorNeighbors() {
 		List<Sector> group = currentSector.getNeighboringSectors();
 		return group.get(gen.nextInt(group.size()));
@@ -114,23 +114,30 @@ public class GalaxySim implements ActionListener {
 			} else
 				currentSectorName = "Unknown";
 			frame.setTitle("GalaxySim: Currently in " + currentSectorName);
-		}
-		else if(e.getSource() == mergeSearchTimer) {
-			Sector sector = getRandomSector();
-			for(Star star : sector.stars) {
-				if(star.hasCombined) {
-					star.findVictimBodies();
+		} else if (e.getSource() == mergeSearchTimer) {
+			Sector randomSector = getRandomSector();
+			if (randomSector != currentSector) {
+				for (Star star : randomSector.stars) {
+					if (star.hasCombined) {
+						star.findVictimBodies();
+					}
 				}
 			}
-			for(Star star : currentSector.stars) {
-				if(star.hasCombined) {
-					star.findVictimBodies();
-				}
+			Star selectedStar = currentSector.getRandomStar();
+			if (selectedStar.hasCombined) {
+				selectedStar.findVictimBodies();
 			}
+//			for (Star star : currentSector.stars) {
+//				if (star.hasCombined) {
+//					star.findVictimBodies();
+//				}
+//			}
 			Sector neighbor = getRandomSectorInCurrentSectorNeighbors();
-			for(Star star : neighbor.stars) {
-				if(star.hasCombined) {
-					star.findVictimBodies();
+			if (neighbor != randomSector) {
+				for (Star star : neighbor.stars) {
+					if (star.hasCombined) {
+						star.findVictimBodies();
+					}
 				}
 			}
 		}
