@@ -15,7 +15,10 @@ import javax.swing.JPanel;
 public class SimPanel extends JPanel implements KeyListener, ActionListener, MouseListener {
 	Camera camera;
 	Ship currentShip;
+	BlackHole testBlackHole;
 	public ArrayList<Sector> currentSectorGroup = new ArrayList<Sector>();
+	public ArrayList<double[]> bgStars = new ArrayList<double[]>();
+	public ArrayList<Integer> bgStarsBrightness = new ArrayList<Integer>();
 
 	public SimPanel() {
 		camera = new Camera(GalaxySim.WIDTH / 2, GalaxySim.HEIGHT / 2);
@@ -23,6 +26,13 @@ public class SimPanel extends JPanel implements KeyListener, ActionListener, Mou
 		System.out.println("Generated " + GalaxySim.stars + " stars and " + GalaxySim.planets + " planets.");
 		currentShip = new Ship(camera.centerX,camera.centerY, 100,100);
 		camera.currentShip = currentShip;
+		
+		testBlackHole = new BlackHole(0,0, 5000);
+		
+		for(int i = 0; i < 100; i++) {
+			bgStars.add(new double[]{GalaxySim.gen.nextDouble()*GalaxySim.WIDTH,GalaxySim.gen.nextDouble()*GalaxySim.HEIGHT});
+			bgStarsBrightness.add(GalaxySim.gen.nextInt(255));
+		}
 	}
 
 	@Override
@@ -106,17 +116,43 @@ public class SimPanel extends JPanel implements KeyListener, ActionListener, Mou
 	public void paintComponent(Graphics g) {
 		g.setColor(Color.BLACK);
 		g.fillRect(0, 0, GalaxySim.WIDTH, GalaxySim.HEIGHT);
+		drawBackgroundStarscape(g);
 		for (Sector s : currentSectorGroup) {
 			s.draw(g);
 		}
+		testBlackHole.draw(g);
 		currentShip.draw(g);
 		camera.drawPlayer(g);
+	}
+
+	private void drawBackgroundStarscape(Graphics g) {
+		double vx = currentShip.xVelocity/10.0;
+		double vy = currentShip.yVelocity/10.0;
+		for(int i = 0; i < bgStars.size(); i++) {
+			bgStars.get(i)[0] = (bgStars.get(i)[0] - vx);
+			bgStars.get(i)[1] = (bgStars.get(i)[1] - vy);
+			
+			int b = bgStarsBrightness.get(i);
+			g.setColor(new Color(b,b,b));
+			g.drawRect((int)bgStars.get(i)[0], (int)bgStars.get(i)[1], 1, 1);
+			int db = b+GalaxySim.gen.nextInt(6) - 3;
+			if(db > 0 && db < 255) {
+				b = db;
+			}
+			else {
+				b = GalaxySim.gen.nextInt(255);
+				bgStars.get(i)[0] = GalaxySim.gen.nextInt(GalaxySim.WIDTH);
+				bgStars.get(i)[1] = GalaxySim.gen.nextInt(GalaxySim.HEIGHT);
+			}
+			bgStarsBrightness.set(i, b);
+		}
 	}
 
 	@Override
 	public void actionPerformed(ActionEvent e) {
 		currentShip.update();
 		camera.update();
+		testBlackHole.update();
 		for (Sector s : currentSectorGroup) {
 			s.update();
 		}

@@ -158,6 +158,7 @@ public abstract class CelestialBody extends GameObject {
 		return false;
 	}
 
+	
 	public String getInfo() {
 		return "Radius " + String.format("%.2f", width) + ", Mass " + String.format("%.2f", mass) + ", Temperature: "
 				+ (int) temperature + "K, OrbitHeight " + orbitalHeight;

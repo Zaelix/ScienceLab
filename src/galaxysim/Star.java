@@ -18,6 +18,12 @@ public class Star extends CelestialBody {
 
 	ArrayList<Star> victims = new ArrayList<Star>();
 
+	Star(double x, double y, double width, double height, double mass){
+		super(x,y,width,height);
+		this.mass = mass;
+		calculateMinMaxSatelliteHeight();
+	}
+	
 	Star(double x, double y, double mass) {
 		super(x, y, calculateRadiusFromMass(mass), false);
 		setRadius(calculateRadiusFromMass(mass));
@@ -138,8 +144,6 @@ public class Star extends CelestialBody {
 		// System.out.println(count + " planets created.");
 	}
 	
-	
-
 	public String getInfo() {
 		return "Class " + classification + ", " + super.getInfo() + ", Luminosity " + String.format("%.1f", luminosity);
 	}
@@ -228,8 +232,13 @@ public class Star extends CelestialBody {
 			double dx = x - victim.x;
 			double dy = y - victim.y;
 			double dist = victim.getDistanceFrom(this);
-			victim.xVelocity += (mass*dx) / Math.pow(dist,2);
-			victim.yVelocity += (mass*dy) / Math.pow(dist,2);
+			double vmassp = victim.mass / (mass + victim.mass);
+			double d2 = Math.pow(dist,2);
+			victim.xVelocity += ((mass*dx) / d2)*(1-vmassp);
+			victim.yVelocity += ((mass*dy) / d2)*(1-vmassp);
+			xVelocity += ((victim.mass*-dx) / d2)*(vmassp);
+			yVelocity += ((victim.mass*-dy) / d2)*(vmassp);
+			
 			if (dist < width / 3) {
 				combineWith(victim);
 				victims.remove(i);

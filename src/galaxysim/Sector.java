@@ -84,7 +84,8 @@ public class Sector {
 	}
 
 	public Star getRandomStar() {
-		return stars.get(GalaxySim.gen.nextInt(stars.size()));
+		if(stars.size() > 0) return stars.get(GalaxySim.gen.nextInt(stars.size()));
+		return null;
 	}
 
 	public void addStar(Star star) {

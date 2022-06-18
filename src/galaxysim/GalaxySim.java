@@ -21,7 +21,7 @@ public class GalaxySim implements ActionListener {
 	public static int planets;
 	public static String currentSectorName = "";
 	public static Sector currentSector;
-
+	
 	JFrame frame = new JFrame();
 	Timer timer;
 	Timer currentSectorTimer;
