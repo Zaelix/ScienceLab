@@ -208,7 +208,13 @@ public class Star extends CelestialBody {
 			Sector previous = GalaxySim.getSectorByName(currentSector);
 			previous.removeStar(this);
 			current.addStar(this);
+			currentSector = current.name;
 		}
+	}
+	
+	public BlackHole convertToBlackHole() {
+		BlackHole bh = new BlackHole(x,y,mass);
+		return bh;
 	}
 	
 	public void customDraw(Graphics g) {
@@ -259,6 +265,7 @@ public class Star extends CelestialBody {
 		super.customUpdate();
 		if (victims.size() > 0)
 			attractVictims();
+		migrate();
 		
 	}
 }

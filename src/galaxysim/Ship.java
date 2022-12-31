@@ -29,7 +29,7 @@ public class Ship extends GameObject {
 
 	@Override
 	public void draw(Graphics g) {
-		Graphics2D g2d = (Graphics2D) g.create((int) 0, (int) 0, (int) GalaxySim.WIDTH,
+	Graphics2D g2d = (Graphics2D) g.create((int) 0, (int) 0, (int) GalaxySim.WIDTH,
 				(int) GalaxySim.HEIGHT);
 		
 		drawX = (Camera.mainCam.centerX + ((this.x - Camera.mainCam.px) * Camera.mainCam.zoom)

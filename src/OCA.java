@@ -1,4 +1,8 @@
 
-public class OCA {
+public interface OCA extends Blah {
+
+}
+
+interface Blah {
 
 }

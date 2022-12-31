@@ -8,14 +8,15 @@ import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
+import java.awt.event.MouseWheelEvent;
+import java.awt.event.MouseWheelListener;
 import java.util.ArrayList;
 
 import javax.swing.JPanel;
 
-public class SimPanel extends JPanel implements KeyListener, ActionListener, MouseListener {
+public class SimPanel extends JPanel implements KeyListener, ActionListener, MouseListener, MouseWheelListener {
 	Camera camera;
 	Ship currentShip;
-	BlackHole testBlackHole;
 	public ArrayList<Sector> currentSectorGroup = new ArrayList<Sector>();
 	public ArrayList<double[]> bgStars = new ArrayList<double[]>();
 	public ArrayList<Integer> bgStarsBrightness = new ArrayList<Integer>();
@@ -26,8 +27,6 @@ public class SimPanel extends JPanel implements KeyListener, ActionListener, Mou
 		System.out.println("Generated " + GalaxySim.stars + " stars and " + GalaxySim.planets + " planets.");
 		currentShip = new Ship(camera.centerX,camera.centerY, 100,100);
 		camera.currentShip = currentShip;
-		
-		testBlackHole = new BlackHole(0,0, 5000);
 		
 		for(int i = 0; i < 100; i++) {
 			bgStars.add(new double[]{GalaxySim.gen.nextDouble()*GalaxySim.WIDTH,GalaxySim.gen.nextDouble()*GalaxySim.HEIGHT});
@@ -120,7 +119,6 @@ public class SimPanel extends JPanel implements KeyListener, ActionListener, Mou
 		for (Sector s : currentSectorGroup) {
 			s.draw(g);
 		}
-		testBlackHole.draw(g);
 		currentShip.draw(g);
 		camera.drawPlayer(g);
 	}
@@ -152,7 +150,6 @@ public class SimPanel extends JPanel implements KeyListener, ActionListener, Mou
 	public void actionPerformed(ActionEvent e) {
 		currentShip.update();
 		camera.update();
-		testBlackHole.update();
 		for (Sector s : currentSectorGroup) {
 			s.update();
 		}
@@ -180,27 +177,35 @@ public class SimPanel extends JPanel implements KeyListener, ActionListener, Mou
 	}
 
 	@Override
-	public void mouseEntered(MouseEvent arg0) {
+	public void mouseEntered(MouseEvent e) {
 		// TODO Auto-generated method stub
 		
 	}
 
 	@Override
-	public void mouseExited(MouseEvent arg0) {
+	public void mouseExited(MouseEvent e) {
 		// TODO Auto-generated method stub
 		
 	}
 
 	@Override
-	public void mousePressed(MouseEvent arg0) {
+	public void mousePressed(MouseEvent e) {
 		// TODO Auto-generated method stub
 		
 	}
 
 	@Override
-	public void mouseReleased(MouseEvent arg0) {
+	public void mouseReleased(MouseEvent e) {
 		// TODO Auto-generated method stub
 		
+	}
+
+	@Override
+	public void mouseWheelMoved(MouseWheelEvent e) {
+		if(e.getScrollType() == MouseWheelEvent.WHEEL_UNIT_SCROLL) {
+			if(e.getWheelRotation() > 0)	camera.setZoom(camera.zoom += 0.01);
+			if(e.getWheelRotation() < 0)	camera.setZoom(camera.zoom -= 0.01);
+		}
 	}
 
 }
