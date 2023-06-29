@@ -27,6 +27,8 @@ public class Pixelizer implements ChangeListener, ActionListener {
 	BufferedImage src;
 	PixelizerPanel panel;
 	Random gen = new Random();
+	
+	ImageEffect wobble;
 
 	public static void main(String[] args) {
 		Pixelizer p = new Pixelizer();
@@ -39,6 +41,7 @@ public class Pixelizer implements ChangeListener, ActionListener {
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		frame.setVisible(true);
 		panel = new PixelizerPanel(this);
+		wobble = new WobbleEffect();
 		try {
 			src = ImageIO.read(new File("src/imageIO/face.jpg"));
 			frame.setPreferredSize(new Dimension(src.getWidth(), src.getHeight() + 90));
@@ -139,6 +142,7 @@ public class Pixelizer implements ChangeListener, ActionListener {
 		
 		return rgb;
 	}
+	
 	@Override
 	public void stateChanged(ChangeEvent e) {
 		JSlider source = (JSlider) e.getSource();
@@ -147,6 +151,7 @@ public class Pixelizer implements ChangeListener, ActionListener {
 
 	@Override
 	public void actionPerformed(ActionEvent e) {
+		img = wobble.apply(src);
 		panel.repaint();
 	}
 }

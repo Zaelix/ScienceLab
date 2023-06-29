@@ -14,6 +14,7 @@ public class Practice {
 		for(int i = 0; i<7; i++) {
 			word += makeLetter();
 		}
+		
 	}
 	
 	static char makeLetter() {
@@ -33,7 +34,6 @@ public class Practice {
 		BigInteger b2 = pad(1000000);
 		long end2 = System.currentTimeMillis();
 		System.out.println("Pad Took " + (end2 - start2) + "ms");
-		
 	}
 	static BigInteger calc(long n){
 	    BigDecimal p = new BigDecimal(1.324717957244746025960908854);
