@@ -17,19 +17,20 @@ import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
 
 public class SaveAsGif {
-
+	static String outputFilePath = "";
+	static long startTime;
 	public static void main(String[] args) {
 		JFileChooser jfc = new JFileChooser();
 		jfc.setFileSelectionMode(JFileChooser.FILES_AND_DIRECTORIES);
 		int returnVal = jfc.showOpenDialog(null);
+		startTime = System.currentTimeMillis();
 		if (returnVal == JFileChooser.APPROVE_OPTION) {
 			File file = jfc.getSelectedFile();
 			if (file.isFile() && (file.getName().contains(".jpg") || file.getName().contains(".png"))) {
-				String input = JOptionPane.showInputDialog("How many images should it be split into?");
-				int count = Integer.parseInt(input);
-				BufferedImage[] images = cutImageIntoMultiple(file, count);
+				//String input = JOptionPane.showInputDialog("How many images should it be split into?");
+				//int count = Integer.parseInt(input);
+				BufferedImage[] images = cutImageIntoMultiple(file);
 
-				String outputFilePath = JOptionPane.showInputDialog("Please name the output file:");
 				try {
 					saveImagesAsGif(images, outputFilePath);
 				} catch (IOException e) {
@@ -38,7 +39,7 @@ public class SaveAsGif {
 				}
 			} else if (file.isDirectory()) {
 				BufferedImage[] images = loadImagesFromDirectory(file);
-				String outputFilePath = JOptionPane.showInputDialog("Please name the output file:");
+				outputFilePath = JOptionPane.showInputDialog("Please name the output file:");
 				try {
 					saveImagesAsGif(images, outputFilePath);
 				} catch (IOException e) {
@@ -49,20 +50,23 @@ public class SaveAsGif {
 		}
 	}
 
-	private static BufferedImage[] cutImageIntoMultiple(File file, int columns) {
-		BufferedImage[] images = new BufferedImage[columns];
-
+	private static BufferedImage[] cutImageIntoMultiple(File file) {
+		BufferedImage[] images = null;
+		int columns = -1;
 		try {
 			BufferedImage image = ImageIO.read(file);
+			columns = image.getWidth()/image.getHeight();
+			images = new BufferedImage[columns];
+			outputFilePath = file.getName().split("[.]")[0]+".gif";
 			int width = image.getWidth() / columns;
 			for (int i = 0; i < columns; i++) {
 				images[i] = image.getSubimage(i*width, 0, width, image.getHeight());
 			}
+			System.out.println("Finished cutting "+file.getName()+" into " + columns + " images.");
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		System.out.println("Finished cutting into " + columns + " images.");
 		return images;
 
 	}
@@ -112,7 +116,7 @@ public class SaveAsGif {
 			// BufferedImage image = ImageIO.read(new File(imagePath));
 			IIOImage iioImage = new IIOImage(image, null, metadata);
 			writer.writeToSequence(iioImage, null);
-			System.out.println("Inserted frame " + frame + " of "+ frameCount + " into gif.");
+			System.out.println("Inserted frame " + (frame+1) + " of "+ frameCount + " into gif.");
 			frame++;
 		}
 
@@ -120,7 +124,8 @@ public class SaveAsGif {
 		writer.endWriteSequence();
 		output.close();
 		writer.dispose();
-		System.out.println("Gif Complete.");
+		long endTime = System.currentTimeMillis();
+		System.out.println("Gif completed in " + (endTime-startTime) + " milliseconds.");
 	}
 
 	private static IIOMetadataNode getNode(IIOMetadataNode rootNode, String nodeName) {
