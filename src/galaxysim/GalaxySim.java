@@ -16,7 +16,7 @@ public class GalaxySim implements ActionListener {
 
 	public static final int WIDTH = 1600;
 	public static final int HEIGHT = 900;
-	public static Random gen = new Random();
+	public static Random gen = new Random(-6461756828592062191L);
 	public static int stars;
 	public static int planets;
 	public static String currentSectorName = "";
@@ -40,7 +40,13 @@ public class GalaxySim implements ActionListener {
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		frame.addKeyListener(panel);
 		frame.addMouseListener(panel);
+		frame.addMouseWheelListener(panel);
 		frame.pack();
+
+		long seed = gen.nextLong();
+		System.out.println("Seed: " + seed);
+		gen = new Random(seed);
+
 		timer = new Timer(1000 / 60, panel);
 		currentSectorTimer = new Timer(1000 / 3, this);
 		mergeSearchTimer = new Timer(1000, this);
@@ -49,23 +55,35 @@ public class GalaxySim implements ActionListener {
 		mergeSearchTimer.start();
 	}
 
-	public static void generateSector(int x, int y) {
+	public static Sector generateSector(int x, int y) {
 		SectorPosition pos = new SectorPosition(x, y);
 		Sector s = new Sector(pos);
 		sectors.put(pos.toString(), s);
 		s.regenerate();
+		return s;
 	}
 
 	public static Sector getCurrentSector(double x, double y) {
-		for (Sector s : sectors.values()) {
-			if (x > s.position.x * Sector.WIDTH - Sector.WIDTH / 2
-					&& x < (s.position.x) * Sector.WIDTH + Sector.WIDTH / 2
-					&& y > s.position.y * Sector.HEIGHT - Sector.HEIGHT / 2
-					&& y < (s.position.y) * Sector.HEIGHT + Sector.HEIGHT / 2) {
-				return s;
-			}
+//		int sx = (int)((x / Sector.WIDTH) + (Sector.WIDTH / 2));
+//		int sy = (int)((y / Sector.HEIGHT) + (Sector.HEIGHT / 2));
+		
+		int sx = (int)((x - (Sector.WIDTH / 2))/Sector.WIDTH);
+		int sy = (int)((y - (Sector.HEIGHT / 2))/Sector.HEIGHT);
+//		for (Sector s : sectors.values()) {
+//			if (x > s.position.x * Sector.WIDTH - Sector.WIDTH / 2
+//					&& x < (s.position.x) * Sector.WIDTH + Sector.WIDTH / 2
+//					&& y > s.position.y * Sector.HEIGHT - Sector.HEIGHT / 2
+//					&& y < (s.position.y) * Sector.HEIGHT + Sector.HEIGHT / 2) {
+//				return s;
+//			}
+//		}
+		SectorPosition pos = new SectorPosition(sx, sy);
+		// MIGRATING INTO NONEXISTANT SECTORS IS MEGA BROKEN
+		if(sectors.containsKey(pos.toString())) return sectors.get(pos.toString());
+		else {
+			//System.out.println("Failure to get Sector at " + sx + ", " + sy);
+			return generateSector(sx,sy);
 		}
-		return null;
 	}
 
 	public static Sector getSectorByName(String sectorName) {
@@ -76,21 +94,21 @@ public class GalaxySim implements ActionListener {
 		}
 		return null;
 	}
-	
+
 	public static Sector getSectorByPosition(int x, int y) {
-		return sectors.get("["+x+","+y+"]");
+		return sectors.get("[" + x + "," + y + "]");
 	}
-	
+
 	public static Sector getRandomSector() {
 		List<Sector> valuesList = new ArrayList<Sector>(sectors.values());
 		return valuesList.get(new Random().nextInt(valuesList.size()));
 	}
-	
+
 	public static Sector getRandomSectorInSectorGroup() {
 		List<Sector> group = currentSector.getSectorGroup();
 		return group.get(gen.nextInt(group.size()));
 	}
-	
+
 	public static Sector getRandomSectorInCurrentSectorNeighbors() {
 		List<Sector> group = currentSector.getNeighboringSectors();
 		return group.get(gen.nextInt(group.size()));
@@ -103,29 +121,36 @@ public class GalaxySim implements ActionListener {
 			if (currentSector != null) {
 				if (!currentSector.name.equals(currentSectorName)) {
 					currentSector.generateNeighbors();
-					panel.currentSectorGroup = currentSector.getSectorGroup();
+					panel.currentSectorGroup = currentSector.getSectorGroup(3);
 				}
 				currentSectorName = currentSector.name;
 			} else
 				currentSectorName = "Unknown";
 			frame.setTitle("GalaxySim: Currently in " + currentSectorName);
-		}
-		else if(e.getSource() == mergeSearchTimer) {
-			Sector sector = getRandomSector();
-			for(Star star : sector.stars) {
-				if(star.hasCombined) {
-					star.findVictimBodies();
+		} else if (e.getSource() == mergeSearchTimer) {
+			Sector randomSector = getRandomSector();
+			if (randomSector != currentSector) {
+				for (Star star : randomSector.stars) {
+					if (star.hasCombined) {
+						star.findVictimBodies();
+					}
 				}
 			}
-			for(Star star : currentSector.stars) {
-				if(star.hasCombined) {
+//			Star selectedStar = currentSector.getRandomStar();
+//			if (selectedStar != null && selectedStar.hasCombined) {
+//				selectedStar.findVictimBodies();
+//			}
+			for (Star star : currentSector.stars) {
+				if (star.hasCombined) {
 					star.findVictimBodies();
 				}
 			}
 			Sector neighbor = getRandomSectorInCurrentSectorNeighbors();
-			for(Star star : neighbor.stars) {
-				if(star.hasCombined) {
-					star.findVictimBodies();
+			if (neighbor != randomSector) {
+				for (Star star : neighbor.stars) {
+					if (star.hasCombined) {
+						star.findVictimBodies();
+					}
 				}
 			}
 		}

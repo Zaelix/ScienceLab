@@ -251,4 +251,8 @@ public class SuperConways extends JPanel implements ActionListener, KeyListener,
 		// TODO Auto-generated method stub
 
 	}
+	
+	public static void testMethod() {
+		
+	}
 }

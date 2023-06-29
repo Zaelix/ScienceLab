@@ -18,6 +18,12 @@ public class Star extends CelestialBody {
 
 	ArrayList<Star> victims = new ArrayList<Star>();
 
+	Star(double x, double y, double width, double height, double mass){
+		super(x,y,width,height);
+		this.mass = mass;
+		calculateMinMaxSatelliteHeight();
+	}
+	
 	Star(double x, double y, double mass) {
 		super(x, y, calculateRadiusFromMass(mass), false);
 		setRadius(calculateRadiusFromMass(mass));
@@ -103,7 +109,8 @@ public class Star extends CelestialBody {
 	}
 
 	public static double calculateRadiusFromMass(double mass) {
-		return 1.08475 * Math.pow(mass, 0.64902) + 0.0414486;
+		//return 1.08475 * Math.pow(mass, 0.64902) + 0.0414486;
+		return 1.0348 * Math.pow(mass, 0.663168) + 0.0941639;
 	}
 
 	public static int getRandomClass() {
@@ -137,8 +144,6 @@ public class Star extends CelestialBody {
 		// System.out.println(count + " planets created.");
 	}
 	
-	
-
 	public String getInfo() {
 		return "Class " + classification + ", " + super.getInfo() + ", Luminosity " + String.format("%.1f", luminosity);
 	}
@@ -156,8 +161,8 @@ public class Star extends CelestialBody {
 	}
 
 	protected void calculateLuminosity() {
-		double surfaceArea = 4 * Math.PI * Math.pow(width, 2);
-		luminosity = (temperature / surfaceArea) * (2 * Math.PI * Math.pow(width, 2));
+		double surfaceArea = 4 * Math.PI * Math.pow(width/2, 2);
+		luminosity = (temperature / surfaceArea) * (2 * Math.PI * Math.pow(width/2, 2));
 	}
 
 	protected void combineWith(Star other) {
@@ -170,8 +175,8 @@ public class Star extends CelestialBody {
 			survivor = this;
 			trash = other;
 		}
-		System.out.println("Combining stars with masses " + survivor.mass + " and " + trash.mass);
-		absorb(trash);
+		//System.out.println("Combining stars with masses " + survivor.mass + " and " + trash.mass);
+		survivor.absorb(trash);
 		Sector s = GalaxySim.getSectorByName(trash.currentSector);
 		if (s != null)
 			s.removeStar(trash);
@@ -196,7 +201,22 @@ public class Star extends CelestialBody {
 		forceSatellitesToRecalculateStatus();
 		findVictimBodies();
 	}
-
+	
+	public void migrate() {
+		Sector current = GalaxySim.getCurrentSector(x, y);
+		if(!current.name.equals(currentSector)) {
+			Sector previous = GalaxySim.getSectorByName(currentSector);
+			previous.removeStar(this);
+			current.addStar(this);
+			currentSector = current.name;
+		}
+	}
+	
+	public BlackHole convertToBlackHole() {
+		BlackHole bh = new BlackHole(x,y,mass);
+		return bh;
+	}
+	
 	public void customDraw(Graphics g) {
 		if (starImage != null) {
 			g.drawImage(starImage, (int) (drawX - (drawWidth / 4.45)), (int) (drawY - (drawHeight / 4.45)),
@@ -214,7 +234,7 @@ public class Star extends CelestialBody {
 	public void findVictimBodies() {
 		for (Sector sector : GalaxySim.getSectorByName(currentSector).getSectorGroup()) {
 			for (Star star : sector.stars) {
-				if (star.mass < this.mass && star.getDistanceFrom(this) < maxSatelliteHeight && !victims.contains(star)) {
+				if (star.mass < this.mass && star.getDistanceFrom(this) < maxSatelliteHeight+minSatelliteHeight && !victims.contains(star)) {
 					victims.add(star);
 				}
 			}
@@ -227,8 +247,13 @@ public class Star extends CelestialBody {
 			double dx = x - victim.x;
 			double dy = y - victim.y;
 			double dist = victim.getDistanceFrom(this);
-			victim.x += dx / dist;
-			victim.y += dy / dist;
+			double vmassp = victim.mass / (mass + victim.mass);
+			double d2 = Math.pow(dist,2);
+			victim.xVelocity += ((mass*dx) / d2)*(1-vmassp);
+			victim.yVelocity += ((mass*dy) / d2)*(1-vmassp);
+			xVelocity += ((victim.mass*-dx) / d2)*(vmassp);
+			yVelocity += ((victim.mass*-dy) / d2)*(vmassp);
+			
 			if (dist < width / 3) {
 				combineWith(victim);
 				victims.remove(i);
@@ -236,9 +261,11 @@ public class Star extends CelestialBody {
 		}
 	}
 
-	public void update() {
-		super.update();
+	public void customUpdate() {
+		super.customUpdate();
 		if (victims.size() > 0)
 			attractVictims();
+		migrate();
+		
 	}
 }

@@ -73,7 +73,7 @@ public class Planet extends CelestialBody {
 	protected void calculateTemperature() {
 		if(parent instanceof Star) {
 			double lum = ((Star) parent).luminosity;
-			temperature = lum / Math.pow(getDistanceFrom(parent)/150,2);
+			temperature = lum / Math.pow(getDistanceFrom(parent)/200,2);
 		}
 		else temperature = -1;
 	}
