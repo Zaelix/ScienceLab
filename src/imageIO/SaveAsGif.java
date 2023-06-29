@@ -113,12 +113,14 @@ public class SaveAsGif {
 			IIOImage iioImage = new IIOImage(image, null, metadata);
 			writer.writeToSequence(iioImage, null);
 			System.out.println("Inserted frame " + frame + " of "+ frameCount + " into gif.");
+			frame++;
 		}
 
 		// Finish writing the GIF file
 		writer.endWriteSequence();
 		output.close();
 		writer.dispose();
+		System.out.println("Gif Complete.");
 	}
 
 	private static IIOMetadataNode getNode(IIOMetadataNode rootNode, String nodeName) {
